@@ -1,6 +1,6 @@
 import React from 'react';
 // import logo from './logo.svg';
-// import './App.css';
+import './App.css';
 
 // function App() {
 //   return (
@@ -30,7 +30,10 @@ import { Cartesian3 } from 'cesium';
 
 function App() {
   return (
-    <Viewer full>
+    <div>
+    <h1>PDX-Flight</h1>
+    {/* <Viewer full> */}
+    <Viewer >
         <Entity
     description="test"
     name="tokyo"
@@ -41,6 +44,7 @@ function App() {
         <PointGraphics pixelSize={10} />
       </Entity> */}
     </Viewer>
+    </div>
   );
 }
 
