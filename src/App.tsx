@@ -88,6 +88,7 @@ function App() {
       <main className={classes.content}>
         <div className={classes.toolbar} />
         {/* <Viewer full> */}
+        <div className='cesiumContainer'>
         <Viewer>
           <Entity
             description='Portland International Airport'
@@ -100,6 +101,7 @@ function App() {
             <PointGraphics pixelSize={10} />
           </Entity> */}
         </Viewer>
+        </div>
       </main>
 
     </div>
