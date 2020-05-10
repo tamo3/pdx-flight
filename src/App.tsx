@@ -1,49 +1,107 @@
 import React from 'react';
 // import logo from './logo.svg';
-import './App.css';
+import { makeStyles } from '@material-ui/core/styles';
+import Drawer from '@material-ui/core/Drawer';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import List from '@material-ui/core/List';
+import Typography from '@material-ui/core/Typography';
+import Divider from '@material-ui/core/Divider';
+import ListItem from '@material-ui/core/ListItem';
+// import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+// import InboxIcon from '@material-ui/icons/MoveToInbox';
+// import MailIcon from '@material-ui/icons/Mail';
 
-// function App() {
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         <img src={logo} className="App-logo" alt="logo" />
-//         <p>
-//           Edit <code>src/App.tsx</code> and save to reload.
-//         </p>
-//         <a
-//           className="App-link"
-//           href="https://reactjs.org"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           Learn React
-//         </a>
-//       </header>
-//     </div>
-//   );
-// }
+import './App.css';
 
 import { Viewer, Entity /*PointGraphics*/  } from 'resium';
 import { Cartesian3 } from 'cesium';
 // const position = Cartesian3.fromDegrees(-74.0707383, 40.7117244, 100);
 // const pointGraphics = { pixelSize: 10 };
+const drawerWidth = 120;
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    display: 'flex',
+  },
+  appBar: {
+    width: `calc(100% - ${drawerWidth}px)`,
+    marginLeft: drawerWidth,
+  },
+  drawer: {
+    width: drawerWidth,
+    flexShrink: 0,
+  },
+  drawerPaper: {
+    width: drawerWidth,
+  },
+  // necessary for content to be below app bar
+  toolbar: theme.mixins.toolbar,
+  content: {
+    flexGrow: 1,
+    backgroundColor: theme.palette.background.default,
+    padding: theme.spacing(3),
+  },
+}));
+
 
 function App() {
+  const classes = useStyles();
   return (
-    <div>
-    <h1>PDX-Flight</h1>
-    {/* <Viewer full> */}
-    <Viewer >
-        <Entity
-    description="test"
-    name="tokyo"
-    point={{ pixelSize: 10 }}
-    position={Cartesian3.fromDegrees(139.767052, 35.681167, 100)}
-  />
-      {/* <Entity position={position} point={pointGraphics} name="Tokyo" description="Hello, world.">
-        <PointGraphics pixelSize={10} />
-      </Entity> */}
-    </Viewer>
+    <div className={classes.root}>
+      <CssBaseline />
+      <AppBar position='fixed' className={classes.appBar}>
+        <Toolbar variant="dense">
+          <Typography variant='h6' noWrap>
+            PDX-Flight
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <Drawer
+        className={classes.drawer}
+        variant='permanent'
+        classes={{
+          paper: classes.drawerPaper,
+        }}
+        anchor='left'>
+        <div className={classes.toolbar} />
+        <Divider />
+        <List>
+          {["Home", "Map",].map((text, index) => (
+            <ListItem button key={text}>
+              <ListItemText primary={text} />
+            </ListItem>
+          ))}
+        </List>
+        <Divider />
+        <List>
+          {["About..."].map((text, index) => (
+            <ListItem button key={text}>
+              <ListItemText primary={text} />
+            </ListItem>
+          ))}
+        </List>
+      </Drawer>
+
+      <main className={classes.content}>
+        <div className={classes.toolbar} />
+        {/* <Viewer full> */}
+        <Viewer>
+          <Entity
+            description='Portland International Airport'
+            name='PDX Airport'
+            point={{ pixelSize: 10 }}
+            position={Cartesian3.fromDegrees(-122.595172, 45.5895, 10)}
+            // position={Cartesian3.fromDegrees(139.767052, 35.681167, 100)}
+          />
+          {/* <Entity position={position} point={pointGraphics} name="Tokyo" description="Hello, world.">
+            <PointGraphics pixelSize={10} />
+          </Entity> */}
+        </Viewer>
+      </main>
+
     </div>
   );
 }
