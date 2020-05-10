@@ -1,6 +1,6 @@
-import React from 'react';
+import React from "react";
 // import logo from './logo.svg';
-import './App.css';
+import "./App.css";
 
 // function App() {
 //   return (
@@ -23,27 +23,29 @@ import './App.css';
 //   );
 // }
 
-import { Viewer, Entity /*PointGraphics*/  } from 'resium';
-import { Cartesian3 } from 'cesium';
+import { Viewer, Entity /*PointGraphics*/ } from "resium";
+import { Cartesian3 } from "cesium";
 // const position = Cartesian3.fromDegrees(-74.0707383, 40.7117244, 100);
 // const pointGraphics = { pixelSize: 10 };
 
 function App() {
   return (
-    <div>
-    <h1>PDX-Flight</h1>
-    {/* <Viewer full> */}
-    <Viewer >
-        <Entity
-    description="test"
-    name="tokyo"
-    point={{ pixelSize: 10 }}
-    position={Cartesian3.fromDegrees(139.767052, 35.681167, 100)}
-  />
-      {/* <Entity position={position} point={pointGraphics} name="Tokyo" description="Hello, world.">
+    <div> 
+      <h1>PDX-Flight</h1>
+      {/* <Viewer full> */}
+      <div className='cesiumContainer'>
+        <Viewer>
+          <Entity
+            description='test'
+            name='tokyo'
+            point={{ pixelSize: 10 }}
+            position={Cartesian3.fromDegrees(139.767052, 35.681167, 100)}
+          />
+          {/* <Entity position={position} point={pointGraphics} name="Tokyo" description="Hello, world.">
         <PointGraphics pixelSize={10} />
       </Entity> */}
-    </Viewer>
+        </Viewer>
+      </div>
     </div>
   );
 }
