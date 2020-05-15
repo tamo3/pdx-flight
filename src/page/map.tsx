@@ -2,11 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Viewer, Entity /*PointGraphics*/  } from 'resium';
 import { Cartesian3 } from 'cesium';
+import './map.css';
+
 
 function MapPage() {
 
   return (
-    <div>
+    <div className="cesiumContainer">
       {/* <h1>Map</h1> */}
       <Viewer>
         <Entity

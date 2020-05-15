@@ -1,0 +1,9 @@
+.cesiumContainer {
+  /* position: absolute; */
+  width: 100%;
+  height: 85vh;
+}
+
+.cesiumContainer > div {
+  height: 100%;
+}
