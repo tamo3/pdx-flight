@@ -1,4 +1,6 @@
 import React from 'react';
+// import { Link } from 'react-router-dom'
+import { BrowserRouter , Route, Switch, Link } from 'react-router-dom';
 // import logo from './logo.svg';
 import { makeStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -13,6 +15,9 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 // import InboxIcon from '@material-ui/icons/MoveToInbox';
 // import MailIcon from '@material-ui/icons/Mail';
+
+import HomePage from './page/home';
+import MapPage from './page/map';
 
 import './App.css';
 
@@ -52,44 +57,63 @@ function App() {
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <AppBar position='fixed' className={classes.appBar}>
-        <Toolbar variant="dense">
-          <Typography variant='h6' noWrap>
-            PDX-Flight
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        className={classes.drawer}
-        variant='permanent'
-        classes={{
-          paper: classes.drawerPaper,
-        }}
-        anchor='left'>
-        <div className={classes.toolbar} />
-        <Divider />
-        <List>
-          {["Home", "Map",].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List>
-        <Divider />
-        <List>
-          {["About..."].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List>
-      </Drawer>
 
-      <main className={classes.content}>
-        <div className={classes.toolbar} />
-        {/* <Viewer full> */}
-        <div className='cesiumContainer'>
-        <Viewer>
+      <BrowserRouter>
+        <AppBar position='fixed' className={classes.appBar}>
+          <Toolbar variant='dense'>
+            <Typography variant='h6' noWrap>
+              PDX-Flight
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <Drawer
+          className={classes.drawer}
+          variant='permanent'
+          classes={{
+            paper: classes.drawerPaper,
+          }}
+          anchor='left'>
+          <div className={classes.toolbar} />
+          <Divider />
+          <List>
+            {["Home"].map((text, index) => (
+              <Link to='/'>
+                <ListItem button key={text}>
+                  <ListItemText primary={text} />
+                </ListItem>
+              </Link>
+            ))}
+          </List>
+          <List>
+            {["Map"].map((text, index) => {
+              const s = `/${text}`;
+              return (
+                <Link to={s}>
+                  <ListItem button key={text}>
+                    <ListItemText primary={text} />
+                  </ListItem>
+                </Link>
+              );
+            })}
+          </List>
+          <Divider />
+          <List>
+            {["About..."].map((text, index) => (
+              <ListItem button key={text}>
+                <ListItemText primary={text} />
+              </ListItem>
+            ))}
+          </List>
+        </Drawer>
+
+        <main className={classes.content}>
+          <div className={classes.toolbar} />
+          {/* <Viewer full> */}
+          <div className='cesiumContainer'>
+            <Switch>
+              <Route exact path='/' component={HomePage} />
+              <Route path='/Map' component={MapPage} />
+              {/* <Viewer>
           <Entity
             description='Portland International Airport'
             name='PDX Airport'
@@ -99,11 +123,12 @@ function App() {
           />
           {/* <Entity position={position} point={pointGraphics} name="Tokyo" description="Hello, world.">
             <PointGraphics pixelSize={10} />
-          </Entity> */}
-        </Viewer>
-        </div>
-      </main>
-
+          </Entity> }
+        </Viewer> */}
+            </Switch>
+          </div>
+        </main>
+      </BrowserRouter>
     </div>
   );
 }
