@@ -29,12 +29,20 @@ app.get('/express_backend', (req, res) => {
 
 
 app.get('/api', (req, res) => {
-  console.log('server app.get /api called');
+  // URL example: "http://localhost:5000/api?file=2016-07-01-0000Z.json"
+  
+  // Since the following is a synchronous code, no need to try..catch myself(?). 
+  // Express would catch by itself. 
+  const file = req.query.file;
+  const directory = file.match(/[0-9]+-[0-9]+-[0-9]+/)[0]; // May throw if the file doesn't exist.
 
-  const rawdata = fs.readFileSync('./server/.historical-data/2016-07-01/2016-07-01-0000Z.json');
+  console.log(`server app.get /api called, file=${file}`);
+
+  const rawdata = fs.readFileSync(`./server/.historical-data/${directory}/${file}`);
   let data = JSON.parse(rawdata);
   console.log(data);
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000'); // CORS -- this was necessary.
+  // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000'); // CORS -- this was necessary.
+  res.setHeader('Access-Control-Allow-Origin', '*'); // CORS -- this was necessary.
   res.setHeader('Access-Control-Allow-Methods', 'GET');
   res.send(data);
 });

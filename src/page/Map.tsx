@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+// import ReactDOM from 'react-dom';
 import { Viewer, Entity /*PointGraphics*/  } from 'resium';
 import { Cartesian3 } from 'cesium';
 import './Map.css';

@@ -13,10 +13,8 @@ import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 // import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-// import InboxIcon from '@material-ui/icons/MoveToInbox';
-// import MailIcon from '@material-ui/icons/Mail';
-import HomeIcon from '@material-ui/icons/Home';
-import ExploreIcon from '@material-ui/icons/Explore';
+// import HomeIcon from '@material-ui/icons/Home';
+// import ExploreIcon from '@material-ui/icons/Explore';
 
 import HomePage from './page/Home';
 import MapPage from './page/Map';
@@ -24,8 +22,8 @@ import HistoryPage from './page/History';
 
 import './App.css';
 
-import { Viewer, Entity /*PointGraphics*/  } from 'resium';
-import { Cartesian3 } from 'cesium';
+// import { Viewer, Entity /*PointGraphics*/  } from 'resium';
+// import { Cartesian3 } from 'cesium';
 // const position = Cartesian3.fromDegrees(-74.0707383, 40.7117244, 100);
 // const pointGraphics = { pixelSize: 10 };
 const drawerWidth = 120;
