@@ -15,12 +15,14 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 // import InboxIcon from '@material-ui/icons/MoveToInbox';
 // import MailIcon from '@material-ui/icons/Mail';
-
-import './App.css';
+import HomeIcon from '@material-ui/icons/Home';
+import ExploreIcon from '@material-ui/icons/Explore';
 
 import HomePage from './page/Home';
 import MapPage from './page/Map';
+import HistoryPage from './page/History';
 
+import './App.css';
 
 import { Viewer, Entity /*PointGraphics*/  } from 'resium';
 import { Cartesian3 } from 'cesium';
@@ -53,6 +55,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
+
 function App() {
   const classes = useStyles();
   return (
@@ -78,7 +81,8 @@ function App() {
           <Divider />
           <List>
             {["Home"].map((text, index) => (
-              <Link to='/'>
+              <Link to='/' key={text}>
+                  {/* <HomeIcon /> */}
                 <ListItem button key={text}>
                   <ListItemText primary={text} />
                 </ListItem>
@@ -89,7 +93,20 @@ function App() {
             {["Map"].map((text, index) => {
               const s = `/${text}`;
               return (
-                <Link to={s}>
+                <Link to={s} key={text}>
+                  <ListItem button key={text}>
+                    <ListItemText primary={text} />
+                  </ListItem>
+                </Link>
+              );
+            })}
+          </List>
+          <Divider />
+          <List>
+            {["History"].map((text, index) => {
+              const s = `/${text}`;
+              return (
+                <Link to={s} key={text}>
                   <ListItem button key={text}>
                     <ListItemText primary={text} />
                   </ListItem>
@@ -114,6 +131,7 @@ function App() {
             <Switch>
               <Route exact path='/' component={HomePage} />
               <Route path='/Map' component={MapPage} />
+              <Route path='/History' component={HistoryPage} />
               {/* <Viewer>
           <Entity
             description='Portland International Airport'

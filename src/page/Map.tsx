@@ -15,7 +15,7 @@ function MapPage() {
           description='Portland International Airport'
           name='PDX Airport'
           point={{ pixelSize: 10 }}
-          position={Cartesian3.fromDegrees(-122.595172, 45.5895, 10)}
+          position={Cartesian3.fromDegrees(-122.595172, 45.5895, 10)}  /* l(long, lat) */
         ></Entity>
       </Viewer>
     </div>

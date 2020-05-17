@@ -6,6 +6,7 @@
     "@craco/craco": "^5.6.2",
     "@hot-loader/react-dom": "^16.11.0",
     "@material-ui/core": "^4.9.13",
+    "@material-ui/icons": "^4.9.1",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
@@ -18,6 +19,7 @@
     "cesium": "^1.64.0",
     "craco-cesium": "^1.2.0",
     "craco-plugin-react-hot-reload": "^0.1.0",
+    "express": "^4.17.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-hot-loader": "^4.12.18",
@@ -28,6 +30,7 @@
   },
   "scripts": {
     "start": "craco start",
+    "server": "nodemon server.ts",
     "build": "craco build",
     "test": "craco test",
     "eject": "react-scripts eject"

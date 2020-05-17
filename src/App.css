@@ -21,6 +21,16 @@ html {
 h1 {
   color: black;
 }
+
+
+.MuiList-root a {
+  color: inherit;
+  text-decoration: none; /* remove the under line for links */
+}
+
+
+/* "><span class="MuiTypography-root MuiListItemText-primary MuiTypography-body1 MuiTypography-displayBlock">Home</span></div> */
+
 /* .cesiumContainer {
   width: 100%;
   height: 85vh;
