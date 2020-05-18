@@ -1,17 +1,17 @@
 import React, { FC } from "react";
 // import ReactDOM from 'react-dom';
-import { Viewer, Entity /*PointGraphics*/, Clock, Globe, Model, CameraFlyTo } from 'resium';
-import Cesium, { Cartesian3 } from 'cesium';
-import './Map.css';
+import { Viewer, Entity /*PointGraphics*/, Clock, Globe, Model, CameraFlyTo } from "resium";
+import { Cartesian3, Transforms, Color } from "cesium";
+import "./Map.css";
 
-
-const glb: string = '../SampleData/models/CesiumAir/Cesium_Air.glb';
+//const glb = "../SampleData/models/CesiumAir/Cesium_Air.glb";
+const glb = "./Cesium_Air.glb";
+// const glb = '../SampleData/models/GroundVehicle/GroundVehicle.glb'
 const origin = Cartesian3.fromDegrees(-95.0, 40.0, 200000.0);
 const cameraDest = Cartesian3.fromDegrees(-95.0, 40.0, 210000);
-// const modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(origin);
+const modelMatrix = Transforms.eastNorthUpToFixedFrame(origin);
 
-
-// (-122.595172, 45.5895, 10)}  (long, lat) 
+// (-122.595172, 45.5895, 10)}  (long, lat)
 
 // const urlBase: string = "http://localhost:5000/api?2016-07-01-0000Z.json";
 const urlBase: string = "http://localhost:5000/api?file=2016-07-01-1400Z.json";
@@ -36,20 +36,20 @@ function fetchData() {
 let counter: number = 0;
 
 function onTick() {
-  if (counter++ % 64 === 0) { // UPdate about every 1 second.
+  if (counter++ % 64 === 0) {
+    // UPdate about every 1 second.
     // const t = Math.floor(counter / 64);
-    console.log(`QQQ`)  
+    console.log(`QQQ`);
   }
 }
 
-
-const SetResult: FC<{s:string}> = ({s}) => {
+const SetResult: FC<{ s: string }> = ({ s }) => {
   return (
     <div>
       <p>props.str</p>
     </div>
-  )
-}
+  );
+};
 
 function HistoryPage() {
   url = urlBase;
@@ -57,15 +57,18 @@ function HistoryPage() {
     <div className='cesiumContainer'>
       <button onClick={fetchData}>Click me</button>
       <Viewer>
-        {/* <CameraFlyTo destination={cameraDest} duration={0} />
+        <CameraFlyTo destination={cameraDest} duration={0} />
         <Model
+          // color={Color.BLACK}
+          show
+          scale={10}
           url={glb}
           modelMatrix={modelMatrix}
           minimumPixelSize={128}
           maximumScale={20000}
           // onReady={action("onReady")}
           // onClick={action("onClick")}
-        />{" "} */}
+        />
         <Globe enableLighting />
         <Clock
           onTick={onTick}
@@ -77,12 +80,12 @@ function HistoryPage() {
           // multiplier={4000} // how much time to advance each tick
           // shouldAnimate // Animation on by default
         />
-        <Entity
+        {/* <Entity
           description='Portland International Airport'
           name='PDX Airport'
           point={{ pixelSize: 10 }}
-          position={Cartesian3.fromDegrees(-122.595172, 45.5895, 10)} /* l(long, lat) */
-        ></Entity>
+          position={Cartesian3.fromDegrees(-122.595172, 45.5895, 10)} 
+        ></Entity> */}
       </Viewer>
       <SetResult s='test' />
     </div>
