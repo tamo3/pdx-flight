@@ -1,7 +1,24 @@
 import React, { FC } from "react";
 // import ReactDOM from 'react-dom';
-import { Viewer, Entity /*PointGraphics*/, Clock, Globe, Model, CameraFlyTo } from "resium";
+import {
+  Viewer,
+  Entity /*PointGraphics*/,
+  Clock,
+  Globe,
+  Model,
+  ModelGraphics,
+  BillboardCollection,
+  Billboard,
+  CameraFlyTo,
+  PointGraphics,
+  BillboardGraphics,
+  BoxGraphics,
+  EllipseGraphics,
+} from "resium";
 import { Cartesian3, Transforms, Color } from "cesium";
+
+import exampleImg from "../SampleData/home.png";
+
 import "./Map.css";
 
 //const glb = "../SampleData/models/CesiumAir/Cesium_Air.glb";
@@ -50,6 +67,8 @@ const SetResult: FC<{ s: string }> = ({ s }) => {
     </div>
   );
 };
+const position = Cartesian3.fromDegrees(-74.0707383, 40.7117244, 100);
+const center = Cartesian3.fromDegrees(-75.59777, 40.03883);
 
 function HistoryPage() {
   url = urlBase;
@@ -57,8 +76,20 @@ function HistoryPage() {
     <div className='cesiumContainer'>
       <button onClick={fetchData}>Click me</button>
       <Viewer>
-        <CameraFlyTo destination={cameraDest} duration={0} />
-        <Model
+        <Entity position={position}>
+          <Billboard position={new Cartesian3(1000000.0, 0.0, 0.0)} image={exampleImg} />
+          <PointGraphics pixelSize={10} />
+          <EllipseGraphics semiMajorAxis={300000} semiMinorAxis={300000} />
+        </Entity>
+
+        {/* <CameraFlyTo destination={cameraDest} duration={0} /> */}
+        {/* <Entity
+          description='Portland International Airport'
+          name='PDX Airport'
+          // point={{ pixelSize: 10 }}
+          // position={Cartesian3.fromDegrees(-122.595172, 45.5895, 10)}
+        ></Entity> */}
+        {/* <Model
           // color={Color.BLACK}
           show
           scale={10}
@@ -68,32 +99,13 @@ function HistoryPage() {
           maximumScale={20000}
           // onReady={action("onReady")}
           // onClick={action("onClick")}
-        />
+        /> */}
         <Globe enableLighting />
-        <Clock
-          onTick={onTick}
-          // startTime={Cesium.JulianDate.fromIso8601("2013-12-25")}
-          // currentTime={Cesium.JulianDate.fromIso8601("2013-12-25")}
-          // stopTime={Cesium.JulianDate.fromIso8601("2013-12-26")}
-          // clockRange={Cesium.ClockRange.LOOP_STOP} // loop when we hit the end time
-          // clockStep={Cesium.ClockStep.SYSTEM_CLOCK_MULTIPLIER}
-          // multiplier={4000} // how much time to advance each tick
-          // shouldAnimate // Animation on by default
-        />
-        {/* <Entity
-          description='Portland International Airport'
-          name='PDX Airport'
-          point={{ pixelSize: 10 }}
-          position={Cartesian3.fromDegrees(-122.595172, 45.5895, 10)} 
-        ></Entity> */}
+        <Clock onTick={onTick} />
       </Viewer>
       <SetResult s='test' />
     </div>
   );
 }
-
-// Clock.onTick.addEventListener(function(clock) {
-//   var currentTime = clock.currentTime;
-// });
 
 export default HistoryPage;
