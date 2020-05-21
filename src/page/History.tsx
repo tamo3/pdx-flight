@@ -25,10 +25,10 @@ type Pos2D = {
 };
 // const origPos: Pos2D = {lat:33.974, lng:-118.322}; // LA
 const origPos: Pos2D = { lat: 45.5895, lng: -122.595172 }; // PDX.
-const position = Cartesian3.fromDegrees(origPos.lng, origPos.lat, 100);
+// const position = Cartesian3.fromDegrees(origPos.lng, origPos.lat, 100);
 const cameraDest = Cartesian3.fromDegrees(origPos.lng, origPos.lat, 210000);
 
-let counter: number = 0;
+const timeDivFactor = 20;
 
 function HistoryPage() {
   const urlBase: string = "http://localhost:5000/api?file=2016-07-01-_TIME_Z.json&lng=_LNG_&lat=_LAT_&range=1000000";
@@ -40,41 +40,35 @@ function HistoryPage() {
   });
   const [curTime, setCurTime] = React.useState<number>(0);
 
-  function update() {
-    setCurTime(curTime + 1);
-  }
-
   function onTick() {
-    if (counter++ % 128 === 0) {
-      // UPdate about every 2 second.
-      // setCurTime(curTime + 1);
-      update();
-      console.log(`QQQ ${counter}`);
-    }
+    setCurTime(curTime + 1);
+    console.log(`QQQ ${curTime}`);
   }
 
   useEffect(() => {
-    // Replace longitude & latitude in URL query string.
-    const tm = curTime % 2400;
-    const min = Math.floor(tm % 60);
-    const hour = Math.floor(tm / 60);
-    const timeStr = hour.toString().padStart(2, "0") + min.toString().padStart(2, "0");
-    const url = urlBase
-      .replace("_LNG_", posTime.lng.toString())
-      .replace("_LAT_", posTime.lat.toString())
-      .replace("_TIME_", timeStr);
-    fetch(url)
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        console.log(data);
-        setAirplaneData(data); // Set the received data array.
-      })
-      .catch((err) => {
-        console.log("Error!");
-        console.log(err);
-      });
+    if (curTime % timeDivFactor === 0) {
+      // Replace longitude & latitude in URL query string.
+      const tm = (curTime / timeDivFactor) % 2400;
+      const min = Math.floor(tm % 60);
+      const hour = Math.floor(tm / 60);
+      const timeStr = hour.toString().padStart(2, "0") + min.toString().padStart(2, "0");
+      const url = urlBase
+        .replace("_LNG_", posTime.lng.toString())
+        .replace("_LAT_", posTime.lat.toString())
+        .replace("_TIME_", timeStr);
+      fetch(url)
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          console.log(data);
+          setAirplaneData(data); // Set the received data array.
+        })
+        .catch((err) => {
+          console.log("Error!");
+          console.log(err);
+        });
+    }
   }, [posTime, curTime]);
 
   const pos: Pos2D = origPos;
@@ -85,7 +79,7 @@ function HistoryPage() {
       <Viewer>
         {
           curTime === 0 && (
-            <CameraFlyTo destination={cameraDest} duration={3} />
+            <CameraFlyTo destination={cameraDest} duration={6} />
           ) /* Move camera only right after page switch*/
         }
         {/* <Scene debugShowFramesPerSecond={true} /> */
