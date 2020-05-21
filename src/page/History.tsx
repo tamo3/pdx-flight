@@ -83,13 +83,18 @@ function HistoryPage() {
     <div className='cesiumContainer'>
       <button onClick={() => setPosTime(pos)}>Click me</button>
       <Viewer>
-        {curTime === 0 && <CameraFlyTo destination={cameraDest} duration={3} />}
-        {/* <Scene debugShowFramesPerSecond={true} /> */}
+        {
+          curTime === 0 && (
+            <CameraFlyTo destination={cameraDest} duration={3} />
+          ) /* Move camera only right after page switch*/
+        }
+        {/* <Scene debugShowFramesPerSecond={true} /> */
+        /* Show FPS number */}
         <Entity>
           <div>
             <Clock onTick={onTick} />
             {airplaneData.map((x: any) => {
-              return <Airplane key={x.Id} lng={x.Cos[1]} lat={x.Cos[0]} high={x.Cos[3]} color={Color.RED} />;
+              return <Airplane key={x.Id} id={x.Id} lng={x.Cos[1]} lat={x.Cos[0]} high={x.Cos[3]} />;
             })}
           </div>
           {/* <Airplane lng={-122.595172} lat={45.5895} high={100} color={Color.CYAN} /> */}
