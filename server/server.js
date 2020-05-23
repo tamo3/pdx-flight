@@ -55,18 +55,14 @@ app.get('/api', (req, res) => {
   const directory = file.match(/[0-9]+-[0-9]+-[0-9]+/)[0]; // May throw if the file doesn't exist.
   const circle = [req.query.lat, req.query.lng, req.query.range];
 
-  console.log(`server app.get /api called, file=${file}  ${circle}`);
   const rawData = fs.readFileSync(`./server/.historical-data/${directory}/${file}`);
   let data = JSON.parse(rawData);
 
-  // const withAlt = data.acList.filter(x => {
-  //   idx++;
-  //   return (x.TT === 'a' && x.Cos && x.Cos.length >= 4)
-  // })
   const inRange = data.acList.filter(x => {
     return (x.TT === 'a' && x.Cos && x.Cos.length >= 4 && InRange(x.Cos, circle));
   })
-  console.log(inRange);
+  // console.log(inRange);
+  console.log(`file=${file}  ${circle} ${inRange.length}`);
 
   // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000'); // CORS -- this was necessary.
   res.setHeader('Access-Control-Allow-Origin', '*'); // CORS -- this was necessary.
