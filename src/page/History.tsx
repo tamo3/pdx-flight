@@ -15,7 +15,7 @@ import {
   // BoxGraphics,
   // EllipseGraphics,
 } from "resium";
-import Cesium, { Cartesian3, ClockViewModel, Transforms, Color } from "cesium";
+import Cesium, { Cartesian3, ClockViewModel, JulianDate, ClockRange, ClockStep, Transforms, Color } from "cesium";
 import Airplane from "./Airplane";
 
 import "./Map.css";
@@ -40,10 +40,17 @@ function HistoryPage() {
     lat: origPos.lat,
   });
   const [curTime, setCurTime] = React.useState<number>(0);
+  const ref = useRef<CesiumComponentRef<Cesium.Viewer>>(null);
 
   function onTick() {
     setCurTime(curTime + 1);
     console.log(`QQQ ${curTime}`);
+    if (ref.current?.cesiumElement) {
+      const clockViewModel = ref.current.cesiumElement.clockViewModel;
+      const tm = clockViewModel.currentTime;
+      console.log(tm);
+      console.log(JulianDate.toDate(tm));
+    }
   }
 
   useEffect(() => {
@@ -75,16 +82,15 @@ function HistoryPage() {
   const pos: Pos2D = origPos;
   console.log(`curTime is ${curTime}`);
 
-  // let clockViewModel;
-
-  const ref = useRef<CesiumComponentRef<Cesium.Viewer>>(null);
   useEffect(() => {
     if (ref.current?.cesiumElement) {
       // ref.current.cesiumElement is Cesium.Viewer
       // DO SOMETHING
-      const clockViewModel = new ClockViewModel(ref.current.cesiumElement.clock);
+      // const clockViewModel = new ClockViewModel(ref.current.cesiumElement.clock);
+      const clockViewModel = ref.current.cesiumElement.clockViewModel;
       const tm = clockViewModel.currentTime;
       console.log(tm);
+      console.log(JulianDate.toDate(tm));
     }
   }, []);
 
@@ -92,6 +98,16 @@ function HistoryPage() {
     <div className='cesiumContainer'>
       <button onClick={() => setPosTime(pos)}>Click me</button>
       <Viewer ref={ref}>
+        <Clock
+          startTime={JulianDate.fromIso8601("2016-07-01")}
+          currentTime={JulianDate.fromIso8601("2016-07-01")}
+          stopTime={JulianDate.fromIso8601("2016-07-02")}
+          clockRange={ClockRange.LOOP_STOP} // loop when we hit the end time
+          clockStep={ClockStep.SYSTEM_CLOCK_MULTIPLIER}
+          // onTick={onTick}
+          multiplier={30} // how much time to advance each tick
+          // shouldAnimate // Animation on by default
+        />
         {
           curTime === 0 && (
             <CameraFlyTo destination={cameraDest} duration={6} />
