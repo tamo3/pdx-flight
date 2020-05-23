@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from "react";
+import React, { FC, useEffect, useState, useRef } from "react";
 // import ReactDOM from 'react-dom';
 import {
   Viewer,
@@ -7,6 +7,7 @@ import {
   Clock,
   Globe,
   Scene,
+  CesiumComponentRef,
   // Model,
   // ModelGraphics,
   // Billboard,
@@ -14,7 +15,7 @@ import {
   // BoxGraphics,
   // EllipseGraphics,
 } from "resium";
-import { Cartesian3, Transforms, Color } from "cesium";
+import Cesium, { Cartesian3, ClockViewModel, Transforms, Color } from "cesium";
 import Airplane from "./Airplane";
 
 import "./Map.css";
@@ -73,10 +74,24 @@ function HistoryPage() {
 
   const pos: Pos2D = origPos;
   console.log(`curTime is ${curTime}`);
+
+  // let clockViewModel;
+
+  const ref = useRef<CesiumComponentRef<Cesium.Viewer>>(null);
+  useEffect(() => {
+    if (ref.current?.cesiumElement) {
+      // ref.current.cesiumElement is Cesium.Viewer
+      // DO SOMETHING
+      const clockViewModel = new ClockViewModel(ref.current.cesiumElement.clock);
+      const tm = clockViewModel.currentTime;
+      console.log(tm);
+    }
+  }, []);
+
   return (
     <div className='cesiumContainer'>
       <button onClick={() => setPosTime(pos)}>Click me</button>
-      <Viewer>
+      <Viewer ref={ref}>
         {
           curTime === 0 && (
             <CameraFlyTo destination={cameraDest} duration={6} />
