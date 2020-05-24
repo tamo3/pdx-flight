@@ -139,7 +139,7 @@ function HistoryPage() {
         <Entity>
           <div>
             {airplaneData.map((x: any) => {
-              return <Airplane key={x.Id} id={x.Id} lng={x.Cos[1]} lat={x.Cos[0]} high={x.Cos[3]} />;
+              return <Airplane key={x.Id} dat={x} />;
             })}
           </div>
           {/* <Airplane lng={-122.595172} lat={45.5895} high={100} color={Color.CYAN} /> */}

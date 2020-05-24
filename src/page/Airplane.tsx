@@ -8,10 +8,7 @@ import {
 import { Cartesian3, Transforms, Color } from "cesium";
 
 type AirplaneProps = {
-  id: number; // ID.
-  lng: number;
-  lat: number;
-  high: number;
+  dat: any; // JSON data from node server.
   color?: Color;
 };
 
@@ -32,14 +29,16 @@ function randomColor(id: number): Color {
   return new Color(r, g, b); // Color R,G,B = [0..1].
 }
 
-export const Airplane: FC<AirplaneProps> = ({ id, lng, lat, high, color }) => {
-  // const position = Cartesian3.fromDegrees(-122.595172, 45.5895, 100);
+export const Airplane: FC<AirplaneProps> = ({ dat, color }) => {
+  const lng = dat.Cos[1];
+  const lat = dat.Cos[0];
+  const high = dat.Cos[3];
   const position = Cartesian3.fromDegrees(lng, lat, high);
   return (
     <div>
       <Entity position={position}>
         {/* <EllipseGraphics semiMajorAxis={100} semiMinorAxis={100} height={500} material={Color.CYAN} /> */}
-        <PointGraphics color={color || randomColor(id)} pixelSize={10} />
+        <PointGraphics color={color || randomColor(dat.Id)} pixelSize={10} />
       </Entity>
     </div>
   );
