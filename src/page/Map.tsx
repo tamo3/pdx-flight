@@ -11,7 +11,7 @@ function MapPage() {
     if (ref.current?.cesiumElement) {
       // ref.current.cesiumElement is Cesium.Viewer
       // DO SOMETHING
-      let clockViewModel = ref.current.cesiumElement.clockViewModel;
+      const clockViewModel = ref.current.cesiumElement.clockViewModel;
       const tm = clockViewModel.currentTime;
       console.log(tm);
       console.log(JulianDate.toDate(tm));

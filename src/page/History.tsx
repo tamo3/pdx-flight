@@ -15,7 +15,16 @@ import {
   // BoxGraphics,
   // EllipseGraphics,
 } from "resium";
-import Cesium, { Cartesian3, ClockViewModel, JulianDate, ClockRange, ClockStep, Transforms, Color } from "cesium";
+import Cesium, {
+  Cartesian3,
+  ClockViewModel,
+  JulianDate,
+  ClockRange,
+  ClockStep,
+  Timeline,
+  Transforms,
+  Color,
+} from "cesium";
 import Airplane from "./Airplane";
 
 import "./Map.css";
@@ -93,12 +102,21 @@ function HistoryPage() {
   useEffect(() => {
     if (ref.current?.cesiumElement) {
       // ref.current.cesiumElement is Cesium.Viewer
-      // const clockViewModel = new ClockViewModel(ref.current.cesiumElement.clock);
-      const clockViewModel = ref.current.cesiumElement.clockViewModel;
-      const tm = clockViewModel.currentTime;
+      // const clock = new ClockViewModel(ref.current.cesiumElement.clock);
+      const clock = ref.current.cesiumElement.clockViewModel;
+      const tm = clock.currentTime;
       console.log(tm);
       console.log(JulianDate.toDate(tm));
-      clockViewModel.currentTime = JulianDate.fromIso8601("2016-07-01");
+      clock.currentTime = JulianDate.fromIso8601("2016-07-01");
+      clock.startTime = JulianDate.fromIso8601("2016-07-01");
+      clock.stopTime = JulianDate.fromIso8601("2016-07-02");
+      clock.clockRange = ClockRange.LOOP_STOP; // loop when we hit the end time
+      clock.clockStep = ClockStep.SYSTEM_CLOCK_MULTIPLIER;
+      clock.clock.onTick.addEventListener(onTick);
+      clock.multiplier = 30; // how much time to advance each tick
+      // shouldAnimate // Animation on by default
+
+      // const timeLine = ref.current.cesiumElement.timeline;
     }
   }, []);
 
@@ -106,16 +124,6 @@ function HistoryPage() {
     <div className='cesiumContainer'>
       <button onClick={() => setPos2D(pos)}>Click me</button>
       <Viewer ref={ref}>
-        <Clock
-          startTime={JulianDate.fromIso8601("2016-07-01")}
-          // currentTime={JulianDate.fromIso8601("2016-07-01")}
-          stopTime={JulianDate.fromIso8601("2016-07-02")}
-          clockRange={ClockRange.LOOP_STOP} // loop when we hit the end time
-          clockStep={ClockStep.SYSTEM_CLOCK_MULTIPLIER}
-          onTick={onTick}
-          multiplier={30} // how much time to advance each tick
-          // shouldAnimate // Animation on by default
-        />
         {
           curTime === 0 && (
             <CameraFlyTo destination={cameraDest} duration={6} />
@@ -125,7 +133,6 @@ function HistoryPage() {
         /* Show FPS number */}
         <Entity>
           <div>
-            {/* <Clock onTick={onTick} /> */}
             {airplaneData.map((x: any) => {
               return <Airplane key={x.Id} id={x.Id} lng={x.Cos[1]} lat={x.Cos[0]} high={x.Cos[3]} />;
             })}
