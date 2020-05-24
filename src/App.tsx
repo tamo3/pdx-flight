@@ -1,51 +1,148 @@
 import React from "react";
+// import { Link } from 'react-router-dom'
+import { BrowserRouter, Route, Switch, Link } from "react-router-dom";
 // import logo from './logo.svg';
+import { makeStyles } from "@material-ui/core/styles";
+import Drawer from "@material-ui/core/Drawer";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import List from "@material-ui/core/List";
+import Typography from "@material-ui/core/Typography";
+import Divider from "@material-ui/core/Divider";
+import ListItem from "@material-ui/core/ListItem";
+// import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from "@material-ui/core/ListItemText";
+// import HomeIcon from '@material-ui/icons/Home';
+// import ExploreIcon from '@material-ui/icons/Explore';
+
+import HomePage from "./page/Home";
+import MapPage from "./page/Map";
+import HistoryPage from "./page/History";
+
 import "./App.css";
 
-// function App() {
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         <img src={logo} className="App-logo" alt="logo" />
-//         <p>
-//           Edit <code>src/App.tsx</code> and save to reload.
-//         </p>
-//         <a
-//           className="App-link"
-//           href="https://reactjs.org"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           Learn React
-//         </a>
-//       </header>
-//     </div>
-//   );
-// }
-
-import { Viewer, Entity /*PointGraphics*/ } from "resium";
-import { Cartesian3 } from "cesium";
+// import { Viewer, Entity /*PointGraphics*/  } from 'resium';
+// import { Cartesian3 } from 'cesium';
 // const position = Cartesian3.fromDegrees(-74.0707383, 40.7117244, 100);
 // const pointGraphics = { pixelSize: 10 };
+const drawerWidth = 120;
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    display: "flex",
+  },
+  appBar: {
+    width: `calc(100% - ${drawerWidth}px)`,
+    marginLeft: drawerWidth,
+  },
+  drawer: {
+    width: drawerWidth,
+    flexShrink: 0,
+  },
+  drawerPaper: {
+    width: drawerWidth,
+  },
+  // necessary for content to be below app bar
+  toolbar: theme.mixins.toolbar,
+  content: {
+    flexGrow: 1,
+    backgroundColor: theme.palette.background.default,
+    padding: theme.spacing(3),
+  },
+}));
 
 function App() {
+  const classes = useStyles();
   return (
-    <div> 
-      <h1>PDX-Flight</h1>
-      {/* <Viewer full> */}
-      <div className='cesiumContainer'>
-        <Viewer>
+    <div className={classes.root}>
+      <CssBaseline />
+
+      <BrowserRouter>
+        <AppBar position='fixed' className={classes.appBar}>
+          <Toolbar variant='dense'>
+            <Typography variant='h6' noWrap>
+              PDX-Flight
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <Drawer
+          className={classes.drawer}
+          variant='permanent'
+          classes={{
+            paper: classes.drawerPaper,
+          }}
+          anchor='left'>
+          <div className={classes.toolbar} />
+          <Divider />
+          <List>
+            {["Home"].map((text, index) => (
+              <Link to='/' key={text}>
+                {/* <HomeIcon /> */}
+                <ListItem button key={text}>
+                  <ListItemText primary={text} />
+                </ListItem>
+              </Link>
+            ))}
+          </List>
+          <List>
+            {["Map"].map((text, index) => {
+              const s = `/${text}`;
+              return (
+                <Link to={s} key={text}>
+                  <ListItem button key={text}>
+                    <ListItemText primary={text} />
+                  </ListItem>
+                </Link>
+              );
+            })}
+          </List>
+          <List>
+            {["History"].map((text, index) => {
+              const s = `/${text}`;
+              return (
+                <Link to={s} key={text}>
+                  <ListItem button key={text}>
+                    <ListItemText primary={text} />
+                  </ListItem>
+                </Link>
+              );
+            })}
+          </List>
+          <Divider />
+          <List>
+            {["About..."].map((text, index) => (
+              <ListItem button key={text}>
+                <ListItemText primary={text} />
+              </ListItem>
+            ))}
+          </List>
+        </Drawer>
+
+        <main className={classes.content}>
+          <div className={classes.toolbar} />
+          {/* <Viewer full> */}
+          <div className='cesiumContainer'>
+            <Switch>
+              <Route exact path='/' component={HomePage} />
+              <Route path='/Map' component={MapPage} />
+              <Route path='/History' component={HistoryPage} />
+              {/* <Viewer>
           <Entity
-            description='test'
-            name='tokyo'
+            description='Portland International Airport'
+            name='PDX Airport'
             point={{ pixelSize: 10 }}
-            position={Cartesian3.fromDegrees(139.767052, 35.681167, 100)}
+            position={Cartesian3.fromDegrees(-122.595172, 45.5895, 10)}
+            // position={Cartesian3.fromDegrees(139.767052, 35.681167, 100)}
           />
           {/* <Entity position={position} point={pointGraphics} name="Tokyo" description="Hello, world.">
-        <PointGraphics pixelSize={10} />
-      </Entity> */}
-        </Viewer>
-      </div>
+            <PointGraphics pixelSize={10} />
+          </Entity> }
+        </Viewer> */}
+            </Switch>
+          </div>
+        </main>
+      </BrowserRouter>
     </div>
   );
 }
