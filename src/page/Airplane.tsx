@@ -2,6 +2,8 @@ import React, { FC } from "react";
 import {
   Entity,
   PointGraphics,
+  RectangleGraphics,
+  EntityStaticDescription,
   // BoxGraphics,
   // EllipseGraphics,
 } from "resium";
@@ -34,11 +36,23 @@ export const Airplane: FC<AirplaneProps> = ({ dat, color }) => {
   const lat = dat.Cos[0];
   const high = dat.Cos[3];
   const position = Cartesian3.fromDegrees(lng, lat, high);
+  const nm: string = dat.Call || "unknown";
+  const desc = `<p>From: ${dat.From}<br>To: ${dat.To}<br>Model: ${dat.Mdl}</p>`;
+  const colr = color || randomColor(dat.Id);
+  const obj: any =
+    dat.Call && dat.To ? (
+      <PointGraphics color={colr} pixelSize={11} />
+    ) : (
+      // Without call sign and destination, this is probably a small non passenger airplane, make it look a bit dim.
+      <PointGraphics color={colr} pixelSize={6} outlineColor={Color.GRAY} outlineWidth={4} />
+      // <RectangleGraphics material={colr} height={8} outlineWidth={8} fill={true} /> -- need coordinates transform!
+    );
+
   return (
     <div>
-      <Entity position={position}>
+      <Entity name={nm} description={desc} position={position}>
         {/* <EllipseGraphics semiMajorAxis={100} semiMinorAxis={100} height={500} material={Color.CYAN} /> */}
-        <PointGraphics color={color || randomColor(dat.Id)} pixelSize={10} />
+        {obj}
       </Entity>
     </div>
   );

@@ -117,8 +117,8 @@ function HistoryPage() {
       clock.clockRange = ClockRange.LOOP_STOP; // loop when we hit the end time
       clock.clockStep = ClockStep.SYSTEM_CLOCK_MULTIPLIER;
       clock.clock.onTick.addEventListener(onTick);
-      clock.multiplier = 30; // how much time to advance each tick
-      // shouldAnimate // Animation on by default
+      clock.multiplier = 30; // 30sec/tick => 1-data-set/min, so airplanes make 1 minutes worth of movement every 2 sec.
+      // shouldAnimate // Animation is turned off at page load.
 
       const timeLine = ref.current.cesiumElement.timeline;
       timeLine.zoomTo(clock.startTime, clock.stopTime);
