@@ -1,26 +1,26 @@
-import React from 'react';
+import React from "react";
 // import { Link } from 'react-router-dom'
-import { BrowserRouter , Route, Switch, Link } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, Link } from "react-router-dom";
 // import logo from './logo.svg';
-import { makeStyles } from '@material-ui/core/styles';
-import Drawer from '@material-ui/core/Drawer';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
-import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
-import ListItem from '@material-ui/core/ListItem';
+import { makeStyles } from "@material-ui/core/styles";
+import Drawer from "@material-ui/core/Drawer";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import List from "@material-ui/core/List";
+import Typography from "@material-ui/core/Typography";
+import Divider from "@material-ui/core/Divider";
+import ListItem from "@material-ui/core/ListItem";
 // import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
+import ListItemText from "@material-ui/core/ListItemText";
 // import HomeIcon from '@material-ui/icons/Home';
 // import ExploreIcon from '@material-ui/icons/Explore';
 
-import HomePage from './page/Home';
-import MapPage from './page/Map';
-import HistoryPage from './page/History';
+import HomePage from "./page/Home";
+import MapPage from "./page/Map";
+import HistoryPage from "./page/History";
 
-import './App.css';
+import "./App.css";
 
 // import { Viewer, Entity /*PointGraphics*/  } from 'resium';
 // import { Cartesian3 } from 'cesium';
@@ -30,7 +30,7 @@ const drawerWidth = 120;
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    display: 'flex',
+    display: "flex",
   },
   appBar: {
     width: `calc(100% - ${drawerWidth}px)`,
@@ -51,8 +51,6 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(3),
   },
 }));
-
-
 
 function App() {
   const classes = useStyles();
@@ -80,7 +78,7 @@ function App() {
           <List>
             {["Home"].map((text, index) => (
               <Link to='/' key={text}>
-                  {/* <HomeIcon /> */}
+                {/* <HomeIcon /> */}
                 <ListItem button key={text}>
                   <ListItemText primary={text} />
                 </ListItem>
@@ -99,7 +97,6 @@ function App() {
               );
             })}
           </List>
-          <Divider />
           <List>
             {["History"].map((text, index) => {
               const s = `/${text}`;

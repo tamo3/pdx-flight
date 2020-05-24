@@ -104,15 +104,16 @@ function HistoryPage() {
     }
   }, [pos2D, curTime]);
 
+  // Init Clock component.
   useEffect(() => {
     if (ref.current?.cesiumElement) {
       // ref.current.cesiumElement is Cesium.Viewer
       // const clock = new ClockViewModel(ref.current.cesiumElement.clock);
       const clock = ref.current.cesiumElement.clockViewModel;
       // const tm = clock.currentTime; console.log(tm); console.log(JulianDate.toDate(tm));
-      clock.currentTime = JulianDate.fromIso8601("2016-07-01");
-      clock.startTime = JulianDate.fromIso8601("2016-07-01");
-      clock.stopTime = JulianDate.fromIso8601("2016-07-02");
+      clock.currentTime = JulianDate.fromIso8601(historyOfDate);
+      clock.startTime = JulianDate.fromIso8601(historyOfDate);
+      clock.stopTime = JulianDate.addDays(clock.startTime, 1, clock.stopTime);
       clock.clockRange = ClockRange.LOOP_STOP; // loop when we hit the end time
       clock.clockStep = ClockStep.SYSTEM_CLOCK_MULTIPLIER;
       clock.clock.onTick.addEventListener(onTick);
@@ -120,6 +121,7 @@ function HistoryPage() {
       // shouldAnimate // Animation on by default
 
       const timeLine = ref.current.cesiumElement.timeline;
+      timeLine.zoomTo(clock.startTime, clock.stopTime);
     }
   }, []);
 
