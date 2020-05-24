@@ -1,3 +1,9 @@
+// Plot airplanes based on historical data.
+//
+// - It is assumed the data is from  https://history.adsbexchange.com/downloads/samples/  2016-07-01.zip
+//   2016-07-01.zip has all the data for the day, the format seems to be the same as:
+//   https://www.virtualradarserver.co.uk/Documentation/Formats/AircraftList.aspx
+
 import React, { FC, useEffect, useState, useRef } from "react";
 // import ReactDOM from 'react-dom';
 import {
@@ -33,51 +39,52 @@ type Pos2D = {
   lat: number;
   lng: number;
 };
+
+const historyOfDate = "2016-07-01";
 // const origPos: Pos2D = {lat:33.974, lng:-118.322}; // LA
 const origPos: Pos2D = { lat: 45.5895, lng: -122.595172 }; // PDX.
 // const position = Cartesian3.fromDegrees(origPos.lng, origPos.lat, 100);
 const cameraDest = Cartesian3.fromDegrees(origPos.lng, origPos.lat, 210000);
 
-const timeDivFactor = 20;
-const pos: Pos2D = origPos;
-
 function HistoryPage() {
-  // Server Access URL template:
-  const urlBase: string = "http://localhost:5000/api?file=2016-07-01-_TIME_Z.json&lng=_LNG_&lat=_LAT_&range=1000000";
+  // Server Access URL template: Files are from  https://history.adsbexchange.com/downloads/samples/
+  // Extracted 2016-07-01.zip -- has the data for the day, every minutes.
 
   // React Hooks:
   const [airplaneData, setAirplaneData] = React.useState<any>([]); // Array of airplane data from the Server.
+  const [curTime, setCurTime] = React.useState<number>(0); // Time as seconds from 00:00, i.e "00:03:00" => 180, "01:00" => 3600.
+  const ref = useRef<CesiumComponentRef<Cesium.Viewer>>(null); // Points to Cesium.Viewer.
   const [pos2D, setPos2D] = React.useState<Pos2D>({
     lng: origPos.lng,
     lat: origPos.lat,
   });
-  const [curTime, setCurTime] = React.useState<number>(0); // Time as integer: ex. "00:11" => 11, "01:00" => 60.
-  const ref = useRef<CesiumComponentRef<Cesium.Viewer>>(null); // Points to Cesium.Viewer.
+  // const pos = origPos;
 
+  // Called ~60 times / second. Updates currentTime, which triggers redraw.
   function onTick() {
     let currentTime = curTime;
     if (ref.current?.cesiumElement) {
+      // Make sure Viewer is mounted.
       const clockViewModel = ref.current.cesiumElement.clockViewModel;
       const tm = clockViewModel.currentTime;
-      console.log(tm);
-      console.log(JulianDate.toIso8601(tm, 0)); // => "2016-07-01T00:00:00Z"
+      // console.log(tm); console.log(JulianDate.toIso8601(tm, 0)); // => "2016-07-01T00:00:00Z"
       const t = JulianDate.toIso8601(tm, 0).match(/[0-9][0-9]:/g);
       if (t?.length && t?.length >= 2) {
-        currentTime = Number(t[0].substr(0, 2)) * 100 + Number(t[1].substr(0, 2));
+        // Calculated seconds from 00:00:00.
+        currentTime = (Number(t[0].substr(0, 2)) * 60 + Number(t[1].substr(0, 2))) * 60;
       }
     }
     setCurTime(currentTime);
   }
 
+  // Fetch data from node server based on the position and time.
   useEffect(() => {
     if (1) {
-      //curTime % timeDivFactor === 0) {
-      // Replace longitude & latitude in URL query string.
-      // const tm = (curTime / timeDivFactor) % 2400;
-      const tm = curTime; // / timeDivFactor) % 2400;
-      const min = Math.floor(tm % 60);
-      const hour = Math.floor(tm / 60);
+      const minutes = curTime / 60; // minutes from 00:00.
+      const min = Math.floor(minutes % 60);
+      const hour = Math.floor(minutes / 60);
       const timeStr = hour.toString().padStart(2, "0") + min.toString().padStart(2, "0");
+      const urlBase = `http://localhost:5000/api?file=${historyOfDate}-_TIME_Z.json&lng=_LNG_&lat=_LAT_&range=1000000`;
       const url = urlBase
         .replace("_LNG_", pos2D.lng.toString())
         .replace("_LAT_", pos2D.lat.toString())
@@ -87,7 +94,7 @@ function HistoryPage() {
           return response.json();
         })
         .then((data) => {
-          console.log(data);
+          // console.log(data);
           setAirplaneData(data); // Set the received data array.
         })
         .catch((err) => {
@@ -97,16 +104,12 @@ function HistoryPage() {
     }
   }, [pos2D, curTime]);
 
-  console.log(`curTime is ${curTime}`);
-
   useEffect(() => {
     if (ref.current?.cesiumElement) {
       // ref.current.cesiumElement is Cesium.Viewer
       // const clock = new ClockViewModel(ref.current.cesiumElement.clock);
       const clock = ref.current.cesiumElement.clockViewModel;
-      const tm = clock.currentTime;
-      console.log(tm);
-      console.log(JulianDate.toDate(tm));
+      // const tm = clock.currentTime; console.log(tm); console.log(JulianDate.toDate(tm));
       clock.currentTime = JulianDate.fromIso8601("2016-07-01");
       clock.startTime = JulianDate.fromIso8601("2016-07-01");
       clock.stopTime = JulianDate.fromIso8601("2016-07-02");
@@ -116,13 +119,13 @@ function HistoryPage() {
       clock.multiplier = 30; // how much time to advance each tick
       // shouldAnimate // Animation on by default
 
-      // const timeLine = ref.current.cesiumElement.timeline;
+      const timeLine = ref.current.cesiumElement.timeline;
     }
   }, []);
 
   return (
     <div className='cesiumContainer'>
-      <button onClick={() => setPos2D(pos)}>Click me</button>
+      {/* <button onClick={() => setPos2D(pos)}>Click me</button> */}
       <Viewer ref={ref}>
         {
           curTime === 0 && (
