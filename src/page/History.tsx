@@ -9,6 +9,7 @@ import React, { useEffect, useState, useRef } from "react";
 import {
   Viewer,
   Entity /*PointGraphics*/,
+  Camera,
   CameraFlyTo,
   // Clock,
   // Scene,
@@ -22,6 +23,7 @@ import {
   // EllipseGraphics,
 } from "resium";
 import Cesium, {
+  Cartesian2,
   Cartesian3,
   // ClockViewModel,
   JulianDate,
@@ -104,6 +106,37 @@ function HistoryPage() {
     }
   }, [pos2D, curTime]);
 
+  // https://stackoverflow.com/questions/33348761/get-center-in-cesium-map
+  let getCnt = 0;
+  function getPosition(percentage: number) {
+    try {
+      let currentTime = getCnt++;
+      if (currentTime !== 0 && ref.current?.cesiumElement) {
+        const viewer = ref.current?.cesiumElement;
+        let lat: number = origPos.lat;
+        let lng: number = origPos.lng;
+        if (viewer.scene) {
+          if (viewer.scene.mode === 3) {
+            const windowPosition = new Cartesian2(viewer.container.clientWidth / 2, viewer.container.clientHeight / 2);
+            const pickRay = viewer.scene.camera.getPickRay(windowPosition);
+            const pickPosition = viewer.scene.globe.pick(pickRay, viewer.scene); // pickPosition can be undefined.
+            const pickPositionCartographic = viewer.scene.globe.ellipsoid.cartesianToCartographic(pickPosition);
+            lng = pickPositionCartographic.longitude * (180 / Math.PI);
+            lat = pickPositionCartographic.latitude * (180 / Math.PI);
+          } else if (viewer.scene.mode === 2) {
+            const camPos = viewer.camera.positionCartographic;
+            lng = camPos.longitude * (180 / Math.PI);
+            lat = camPos.latitude * (180 / Math.PI);
+          }
+          console.log({ lng, lat });
+          setPos2D({ lng, lat });
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   // Init Clock component.
   useEffect(() => {
     if (ref.current?.cesiumElement) {
@@ -125,18 +158,20 @@ function HistoryPage() {
       // Initialize timeLine Widget at the bottom.
       const timeLine = ref.current.cesiumElement.timeline;
       timeLine.zoomTo(clock.startTime, clock.stopTime);
+
+      // const camera = ref.current.cesiumElement.camera;
+      // camera.changed.addEventListener(getPosition);
+      // camera.percentageChanged = 0.1;
     }
   }, []); // ESlint complains about this (add onTick, etc), but if you do so, then things don't work well.
-  // I think it is OK because this is a one time initiazation.
+  // I think it is OK because this is a one time initialization.
 
   return (
     <div className='cesiumContainer'>
       <Viewer ref={ref}>
-        {
-          curTime === 0 && (
-            <CameraFlyTo destination={cameraDest} duration={6} />
-          ) /* Move camera only right after page switch*/
-        }
+        <Camera percentageChanged={0.1} onChange={getPosition} />
+        /* Move camera only right after page switch*/
+        <CameraFlyTo destination={cameraDest} duration={6} once={true} />
         {/* <Scene debugShowFramesPerSecond={true} /> */
         /* Show FPS number */}
         <Entity>
