@@ -40,11 +40,12 @@ type Pos2D = {
   lng: number;
 };
 
-export const historyOfDate = "2016-07-01";
-// const origPos: Pos2D = {lat:33.974, lng:-118.322}; // LA
+export const historyOfDate = "2016-07-01"; // This must match with the data file names served by node server (i.e 2016-07-01-nnnnZ.json, etc)
+
 const origPos: Pos2D = { lat: 45.5895, lng: -122.595172 }; // PDX.
-// const position = Cartesian3.fromDegrees(origPos.lng, origPos.lat, 100);
 const cameraDest = Cartesian3.fromDegrees(origPos.lng, origPos.lat, 210000);
+// const origPos: Pos2D = {lat:33.974, lng:-118.322}; // LA
+// const position = Cartesian3.fromDegrees(origPos.lng, origPos.lat, 100);
 
 function HistoryPage() {
   // Server Access URL template: Files are from  https://history.adsbexchange.com/downloads/samples/
@@ -58,7 +59,6 @@ function HistoryPage() {
     lng: origPos.lng,
     lat: origPos.lat,
   });
-  // const pos = origPos;
 
   // Called ~60 times / second. Updates currentTime, which triggers redraw.
   function onTick() {
@@ -107,8 +107,10 @@ function HistoryPage() {
   // Init Clock component.
   useEffect(() => {
     if (ref.current?.cesiumElement) {
+      // Make sure Viewer is mounted.
       // ref.current.cesiumElement is Cesium.Viewer
-      // const clock = new ClockViewModel(ref.current.cesiumElement.clock);
+
+      // Initialize the Clock/Animation Widget.
       const clock = ref.current.cesiumElement.clockViewModel;
       // const tm = clock.currentTime; console.log(tm); console.log(JulianDate.toDate(tm));
       clock.currentTime = JulianDate.fromIso8601(historyOfDate);
@@ -120,14 +122,15 @@ function HistoryPage() {
       clock.multiplier = 30; // 30sec/tick => 1-data-set/min, so airplanes make 1 minutes worth of movement every 2 sec.
       // shouldAnimate // Animation is turned off at page load.
 
+      // Initialize timeLine Widget at the bottom.
       const timeLine = ref.current.cesiumElement.timeline;
       timeLine.zoomTo(clock.startTime, clock.stopTime);
     }
-  }, [onTick]);
+  }, []); // ESlint complains about this (add onTick, etc), but if you do so, then things don't work well.
+  // I think it is OK because this is a one time initiazation.
 
   return (
     <div className='cesiumContainer'>
-      {/* <button onClick={() => setPos2D(pos)}>Click me</button> */}
       <Viewer ref={ref}>
         {
           curTime === 0 && (
@@ -142,7 +145,6 @@ function HistoryPage() {
               return <Airplane key={x.Id} dat={x} />;
             })}
           </div>
-          {/* <Airplane lng={-122.595172} lat={45.5895} high={100} color={Color.CYAN} /> */}
         </Entity>
         <Globe enableLighting />
       </Viewer>
