@@ -4,15 +4,15 @@
 //   2016-07-01.zip has all the data for the day, the format seems to be the same as:
 //   https://www.virtualradarserver.co.uk/Documentation/Formats/AircraftList.aspx
 
-import React, { FC, useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 // import ReactDOM from 'react-dom';
 import {
   Viewer,
   Entity /*PointGraphics*/,
   CameraFlyTo,
-  Clock,
+  // Clock,
+  // Scene,
   Globe,
-  Scene,
   CesiumComponentRef,
   // Model,
   // ModelGraphics,
@@ -23,13 +23,13 @@ import {
 } from "resium";
 import Cesium, {
   Cartesian3,
-  ClockViewModel,
+  // ClockViewModel,
   JulianDate,
   ClockRange,
   ClockStep,
-  Timeline,
-  Transforms,
-  Color,
+  // Timeline,
+  // Transforms,
+  // Color,
 } from "cesium";
 import Airplane from "./Airplane";
 
@@ -40,7 +40,7 @@ type Pos2D = {
   lng: number;
 };
 
-const historyOfDate = "2016-07-01";
+export const historyOfDate = "2016-07-01";
 // const origPos: Pos2D = {lat:33.974, lng:-118.322}; // LA
 const origPos: Pos2D = { lat: 45.5895, lng: -122.595172 }; // PDX.
 // const position = Cartesian3.fromDegrees(origPos.lng, origPos.lat, 100);
@@ -51,10 +51,10 @@ function HistoryPage() {
   // Extracted 2016-07-01.zip -- has the data for the day, every minutes.
 
   // React Hooks:
-  const [airplaneData, setAirplaneData] = React.useState<any>([]); // Array of airplane data from the Server.
-  const [curTime, setCurTime] = React.useState<number>(0); // Time as seconds from 00:00, i.e "00:03:00" => 180, "01:00" => 3600.
+  const [airplaneData, setAirplaneData] = useState<any>([]); // Array of airplane data from the Server.
+  const [curTime, setCurTime] = useState<number>(0); // Time as seconds from 00:00, i.e "00:03:00" => 180, "01:00" => 3600.
   const ref = useRef<CesiumComponentRef<Cesium.Viewer>>(null); // Points to Cesium.Viewer.
-  const [pos2D, setPos2D] = React.useState<Pos2D>({
+  const [pos2D, setPos2D] = useState<Pos2D>({
     lng: origPos.lng,
     lat: origPos.lat,
   });
@@ -123,7 +123,7 @@ function HistoryPage() {
       const timeLine = ref.current.cesiumElement.timeline;
       timeLine.zoomTo(clock.startTime, clock.stopTime);
     }
-  }, []);
+  }, [onTick]);
 
   return (
     <div className='cesiumContainer'>

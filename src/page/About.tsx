@@ -2,12 +2,12 @@ import React from "react";
 // import ReactDOM from 'react-dom';
 import "./Home.css";
 
-function HomePage() {
+function AboutPage() {
   return (
     <div className='HomePage'>
-      <h2>Home</h2>
+      <h2>About</h2>
     </div>
   );
 }
 
-export default HomePage;
+export default AboutPage;
