@@ -23,12 +23,14 @@ import {
   // EllipseGraphics,
 } from "resium";
 import Cesium, {
+  Camera as CCamera,
   Cartesian2,
   Cartesian3,
   // ClockViewModel,
   JulianDate,
   ClockRange,
   ClockStep,
+  Rectangle,
   // Timeline,
   // Transforms,
   // Color,
@@ -45,9 +47,19 @@ type Pos2D = {
 export const historyOfDate = "2016-07-01"; // This must match with the data file names served by node server (i.e 2016-07-01-nnnnZ.json, etc)
 
 const origPos: Pos2D = { lat: 45.5895, lng: -122.595172 }; // PDX.
-const cameraDest = Cartesian3.fromDegrees(origPos.lng, origPos.lat, 210000);
+const cameraDest = Cartesian3.fromDegrees(origPos.lng, origPos.lat, 250000);
 // const origPos: Pos2D = {lat:33.974, lng:-118.322}; // LA
 // const position = Cartesian3.fromDegrees(origPos.lng, origPos.lat, 100);
+const delta = 1.2;
+const camHome = Rectangle.fromDegrees(
+  origPos.lng - delta,
+  origPos.lat - delta,
+  origPos.lng + delta,
+  origPos.lat + delta
+);
+// const camHome = Rectangle.fromDegrees(117.940573, -29.808406, 118.313421, -29.468825);
+CCamera.DEFAULT_VIEW_RECTANGLE = camHome;
+CCamera.DEFAULT_VIEW_FACTOR = 0;
 
 function HistoryPage() {
   // Server Access URL template: Files are from  https://history.adsbexchange.com/downloads/samples/
@@ -171,7 +183,7 @@ function HistoryPage() {
       <Viewer ref={ref}>
         <Camera percentageChanged={0.1} onChange={getPosition} />
         /* Move camera only right after page switch*/
-        <CameraFlyTo destination={cameraDest} duration={6} once={true} />
+        <CameraFlyTo destination={cameraDest} duration={0} once={true} />
         {/* <Scene debugShowFramesPerSecond={true} /> */
         /* Show FPS number */}
         <Entity>
