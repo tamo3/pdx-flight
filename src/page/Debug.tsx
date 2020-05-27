@@ -1,9 +1,74 @@
 import React from "react";
 
+// Should not exceed 12 hours
+// fetch(
+//   "https://aerodatabox.p.rapidapi.com/flights/airports/icao/KPDX/2020-05-25T10%253A00/2020-05-25T20%253A00?withLeg=false&direction=Both",
+//   {
+//     method: "GET",
+//     headers: {
+//       "x-rapidapi-host": "aerodatabox.p.rapidapi.com",
+//       "x-rapidapi-key": "ff1949cfaamsh7acf24456654c6fp1f1679jsn2c9d6264fded",
+//     },
+//   }
+// )
+//   .then((response) => {
+//     console.log(response);
+//   })
+//   .catch((err) => {
+//     console.log(err);
+//   });
+
+const urlAirlane = "http://localhost:5000/air";
+function getAirplane() {
+  fetch(urlAirlane)
+    .then((response) => {
+      console.log(response);
+      return response.json;
+    })
+    .then((data) => {
+      console.log(data);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+const urlAirport = "http://localhost:5000/airport";
+function getAirport() {
+  fetch(urlAirport)
+    .then((response) => {
+      console.log(response);
+      return response.json;
+    })
+    .then((data) => {
+      console.log(data);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+function getAir1() {
+  const url = "https://opensky-network.org/api/states/all?lamin=45.8389&lomin=5.9962&lamax=47.8229&lomax=10.5226";
+  fetch(url)
+    .then((response) => {
+      console.log(response);
+      return response.json;
+    })
+    .then((data) => {
+      console.log(data);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
 export default function DebugPage() {
   return (
     <div>
       <h1>Debug Page</h1>
+      <button onClick={getAir1}>AirPlane</button>
+      <button onClick={getAirport}>AirPort</button>
     </div>
   );
 }

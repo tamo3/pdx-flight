@@ -3,11 +3,11 @@ const express = require('express');
 const path = require('path');
 //let assert = require('assert');
 const fs = require('fs');
-
+//const fetch = require('node-fetch');
 const app = express();
 const port = process.env.PORT || 5000;  // Use given port when deployed, or localhost:5000.
-
 var router = express.Router();
+const axios = require("axios");
 
 
 if (process.env.NODE_ENV === 'production') {
@@ -21,11 +21,10 @@ app.use(express.json());
 // console.log that your server is up and running
 app.listen(port, () => console.log(`Listening on port ${port}`));
 
-// Route: /express_backend -- for debugging.
-app.get('/express_backend', (req, res) => {
-  console.log('server app.get /express_backend called');
-  res.send({ "express": "Hello from Express!" });
-});
+
+///////////////////////////////////////////////////////////////////////////////
+// Historical Airplane Position Data API
+///////////////////////////////////////////////////////////////////////////////
 
 // Calculate distance between 2 points in meters.
 function distance(lat1, lng1, lat2, lng2) {
@@ -49,8 +48,8 @@ app.get('/api', (req, res) => {
   // const dis = distance(45.423813, -122.727625, 37.799269, -122.463953);
   // console.log(dis);
 
-  // Since the following is a synchronous code, no need to try..catch myself(?). 
-  // Express would catch by itself. 
+  // Since the following is a synchronous code, no need to try..catch myself(?).
+  // Express would catch by itself.
   const file = req.query.file;
   const directory = file.match(/[0-9]+-[0-9]+-[0-9]+/)[0]; // May throw if the file doesn't exist.
   const circle = [req.query.lat, req.query.lng, req.query.range];
@@ -72,3 +71,89 @@ app.get('/api', (req, res) => {
 
 
 
+
+app.get('/tmp', (req, res) => {
+  axios({
+    "method": "GET",
+    "url": "https://cometari-airportsfinder-v1.p.rapidapi.com/api/airports/by-radius",
+    "headers": {
+      "content-type": "application/octet-stream",
+      "x-rapidapi-host": "cometari-airportsfinder-v1.p.rapidapi.com",
+      "x-rapidapi-key": "eccc71950emsh71a3ca86e50f985p195ea4jsndc1501ca6804"
+    }, "params": {
+      "radius": "50",
+      "lng": "-157.895277",
+      "lat": "21.265600"
+    }
+  })
+    .then((response) => {
+      console.log(response)
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+});
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Realtime Airplane Position Data
+///////////////////////////////////////////////////////////////////////////////
+app.get('/adsbx', (req, res) => {
+  axios({
+    "method": "GET",
+    "url": "https://adsbx-flight-sim-traffic.p.rapidapi.com/api/aircraft/json/lat/45.5895/lon/-122.595172/dist/25/",
+    "headers": {
+      "content-type": "application/octet-stream",
+      "x-rapidapi-host": "adsbx-flight-sim-traffic.p.rapidapi.com",
+      "x-rapidapi-key": "ff1949cfaamsh7acf24456654c6fp1f1679jsn2c9d6264fded",
+      "useQueryString": true
+    }
+  })
+    .then((response) => {
+      console.log(response)
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+})
+
+///////////////////////////////////////////////////////////////////////////////
+// Realtime Airplane Position Data using OpenSky
+///////////////////////////////////////////////////////////////////////////////
+
+// const origPos: Pos2D = { lat: 45.5895, lng: -122.595172 }; // PDX.
+app.get('/opensky', (req, res) => {
+  axios({
+    "method": "GET",
+    "url": "https://opensky-network.org/api/states/all?lamin=44.5895&lomin=-123.595&lamax=46.5895&lomax=-121.595",
+  })
+    .then((response) => {
+      console.log(response)
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+})
+
+app.get('/airport', (req, res) => {
+  axios({
+    "method": "GET",
+    "url": "https://aerodatabox.p.rapidapi.com/flights/airports/icao/KPDX/2019-12-26T12%253A00/2019-12-27T00%253A00",
+    "headers": {
+      "content-type": "application/octet-stream",
+      "x-rapidapi-host": "aerodatabox.p.rapidapi.com",
+      "x-rapidapi-key": "ff1949cfaamsh7acf24456654c6fp1f1679jsn2c9d6264fded",
+      "useQueryString": true
+    }, "params": {
+      "direction": "Arrival"
+    }
+  })
+    .then((response) => {
+      console.log(response)
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+
+})
