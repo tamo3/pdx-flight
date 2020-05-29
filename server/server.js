@@ -15,11 +15,16 @@ console.log('PUBLIC_URL is: ', process.env.PUBLIC_URL);
 if (process.env.NODE_ENV === 'production') {
   // NOTE: static pages, such as '/' or '/home' are served by the following code ('express.static'). 
   // __dirname: Node.js script to return the directory where this script is running.
-  // Heroku deploy debugging tip: to see files on Heroku, you can do this:
-  // > heroku login                                 (opens browser)
-  // > heroku run bash -a My-App-Name-In-Heroku     (i.e. pdx-flight)
-  // $ cd app
-  // $ ls
+  // Heroku deploy debugging tips: 
+  // To see files on Heroku, you can do this:
+  //   > heroku login                                    (opens browser)
+  //   > heroku run bash --app My-App-Name-In-Heroku     (i.e. pdx-flight)
+  //   $ cd app
+  //   $ ls
+  // To see log (console log) for this server.js:
+  //   > heroku logs --tail --app pdx-flight
+  //   ... shows the log and it keeps displaying new log messages ...
+  // 
   console.log(`QQQ using ${__dirname} ../build`);
   app.use(express.static(path.join(__dirname, '../build'))); // build directory is ./server/../build
 }
