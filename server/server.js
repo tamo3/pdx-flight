@@ -13,12 +13,21 @@ const toFixed = require('tofixed');
 console.log('PUBLIC_URL is: ', process.env.PUBLIC_URL);
 
 if (process.env.NODE_ENV === 'production') {
-  console.log(`QQQ using ${__dirname} ./build`);
-  app.use(express.static(path.join(__dirname, '../build')));
+  // NOTE: static pages, such as '/' or '/home' are served by the following code ('express.static'). 
+  // __dirname: Node.js script to return the directory where this script is running.
+  // Heroku deploy debugging tip: to see files on Heroku, you can do this:
+  // > heroku login                                 (opens browser)
+  // > heroku run bash -a My-App-Name-In-Heroku     (i.e. pdx-flight)
+  // $ cd app
+  // $ ls
+  console.log(`QQQ using ${__dirname} ../build`);
+  app.use(express.static(path.join(__dirname, '../build'))); // build directory is ./server/../build
 }
-else { // TT: not sure if this is needed.
-  console.log(`QQQ using ${__dirname} ./public`);
-  app.use(express.static(path.join(__dirname, '../public')));
+else {
+  // TT: this is not really used. During the debugging, React uses its own server running and doesn't use
+  // express server.
+  console.log(`QQQ using ${__dirname} ../public`);
+  app.use(express.static(path.join(__dirname, '../public'))); // publicdirectory is ./server/../public
 }
 app.use(express.json());
 
