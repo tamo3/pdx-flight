@@ -182,7 +182,7 @@ function HistoryPage() {
     <div className='cesiumContainer'>
       <Viewer ref={ref}>
         <Camera percentageChanged={0.1} onChange={getPosition} />
-        /* Move camera only right after page switch*/
+        {/* once = Move camera only once */}
         <CameraFlyTo destination={cameraDest} duration={0} once={true} />
         {/* <Scene debugShowFramesPerSecond={true} /> */
         /* Show FPS number */}
