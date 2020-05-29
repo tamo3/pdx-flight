@@ -10,6 +10,8 @@ var router = express.Router();
 const axios = require("axios");
 const toFixed = require('tofixed');
 
+console.log('PUBLIC_URL is: ', process.env.PUBLIC_URL);
+
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, './build')));
 }
