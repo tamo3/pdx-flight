@@ -14,11 +14,11 @@ console.log('PUBLIC_URL is: ', process.env.PUBLIC_URL);
 
 if (process.env.NODE_ENV === 'production') {
   console.log(`QQQ using ${__dirname} ./build`);
-  app.use(express.static(path.join(__dirname, './build')));
+  app.use(express.static(path.join(__dirname, '../build')));
 }
 else { // TT: not sure if this is needed.
   console.log(`QQQ using ${__dirname} ./public`);
-  app.use(express.static(path.join(__dirname, './public')));
+  app.use(express.static(path.join(__dirname, '../public')));
 }
 app.use(express.json());
 
