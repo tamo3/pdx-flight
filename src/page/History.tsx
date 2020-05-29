@@ -98,7 +98,7 @@ function HistoryPage() {
       const min = Math.floor(minutes % 60);
       const hour = Math.floor(minutes / 60);
       const timeStr = hour.toString().padStart(2, "0") + min.toString().padStart(2, "0");
-      const urlBase = `http://localhost:5000/api?file=${historyOfDate}-_TIME_Z.json&lng=_LNG_&lat=_LAT_&range=1000000`;
+      const urlBase = `/api/history?file=${historyOfDate}-_TIME_Z.json&lng=_LNG_&lat=_LAT_&range=1000000`;
       const url = urlBase
         .replace("_LNG_", pos2D.lng.toString())
         .replace("_LAT_", pos2D.lat.toString())
@@ -108,7 +108,7 @@ function HistoryPage() {
           return response.json();
         })
         .then((data) => {
-          // console.log(data);
+          //console.log(data);
           setAirplaneData(data); // Set the received data array.
         })
         .catch((err) => {

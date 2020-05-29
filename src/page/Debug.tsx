@@ -18,20 +18,7 @@ import React from "react";
 //     console.log(err);
 //   });
 
-const urlAirlane = "http://localhost:5000/air";
-function getAirplane() {
-  fetch(urlAirlane)
-    .then((response) => {
-      console.log(response);
-      return response.json;
-    })
-    .then((data) => {
-      console.log(data);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-}
+//   // URL example: "/api/opensky?lng=-122.595172&lat=45.5895&range=1000000
 
 const urlAirport = "http://localhost:5000/airport";
 function getAirport() {
@@ -50,12 +37,31 @@ function getAirport() {
 
 function getAir1() {
   const url = "https://opensky-network.org/api/states/all?lamin=45.8389&lomin=5.9962&lamax=47.8229&lomax=10.5226";
-  fetch(url)
+  //   fetch(url)
+  //     .then((response) => {
+  //       console.log(response);
+  //       return response.json;
+  //     })
+  //     .then((data) => {
+  //       console.log(data);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+}
+
+const urlAirlane = "/api/opensky?lng=-122.595172&lat=45.5895&range=1000000";
+function getAirplane() {
+  fetch(urlAirlane)
     .then((response) => {
-      console.log(response);
-      return response.json;
+      const res: any = response;
+      // console.log(`res 0 ${res.states[0]}`);
+      // console.log(response);
+      return response.json();
     })
     .then((data) => {
+      const dat: any = data;
+      console.log(`data 0 ${dat[0]}`);
       console.log(data);
     })
     .catch((err) => {
@@ -67,7 +73,7 @@ export default function DebugPage() {
   return (
     <div>
       <h1>Debug Page</h1>
-      <button onClick={getAir1}>AirPlane</button>
+      <button onClick={getAirplane}>AirPlane</button>
       <button onClick={getAirport}>AirPort</button>
     </div>
   );
