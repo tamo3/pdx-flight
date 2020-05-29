@@ -13,17 +13,24 @@ const toFixed = require('tofixed');
 console.log('PUBLIC_URL is: ', process.env.PUBLIC_URL);
 
 if (process.env.NODE_ENV === 'production') {
-  console.log("QQQ using Build");
+  console.log(`QQQ using ${__dirname} ./build`);
   app.use(express.static(path.join(__dirname, './build')));
 }
 else { // TT: not sure if this is needed.
-  console.log("QQQ using public");
+  console.log(`QQQ using ${__dirname} ./public`);
   app.use(express.static(path.join(__dirname, './public')));
 }
 app.use(express.json());
 
 // console.log that your server is up and running
 app.listen(port, () => console.log(`Listening on port ${port}`));
+
+
+// Route: /express_backend -- for debugging.
+app.get('/debug', (req, res) => {
+  console.log('server app.get /express_backend called');
+  res.send({ "express": "Hello from Express!" });
+});
 
 
 ///////////////////////////////////////////////////////////////////////////////
