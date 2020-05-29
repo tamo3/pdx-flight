@@ -1,4 +1,10 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Installation
+In your working directory:
+> git checkout https://github.com/tamo3/pdx-flight.git
+> yarn install
+
+NOTE: npm install doesn't work. Please use yarn install.
 
 ## Available Scripts
 
