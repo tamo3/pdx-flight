@@ -29,7 +29,7 @@ import Cesium, {
   // Transforms,
   // Color,
 } from "cesium";
-import Airplane from "./Airplane";
+import Airplane, { AirplaneData } from "./Airplane";
 
 import "./Map.css";
 
@@ -85,6 +85,28 @@ function MapPage() {
     lat: origPos.lat,
   });
 
+  // Convert JSON data from OpenSky to our format. src is a 2D array.
+  function openSkyToAirplaneData(srcJson: any) {
+    const src = srcJson.states;
+    const adat: AirplaneData[] = src.map((x: any) => {
+      const alt: number = (x[13] ?? x[7] ?? 0) * 3.28; // meter => feet.
+      const cos: number[] = [x[6], x[5], 0, alt];
+      const dst: AirplaneData = {
+        Call: x[1], // "WJA531"
+        Cos: cos, // At least 4 elements, lat, lng (degrees), time (UTC), alt feet(?).
+        Cou: x[2],
+        From: "unknown", // "CYYC Calgary, Canada"
+        Icao: x[0], // "C03472"
+        Mdl: "unknown", // "Boeing 737NG 7CT/W"
+        Op: "unknown", // "WestJet"
+        OpIcao: x.OpIcao, // "WJA"
+        To: "unknown", // "CYYJ Victoria, Canada"
+      };
+      return dst;
+    });
+    return adat;
+  }
+
   // One time initialization.
   useEffect(() => {
     if (ref.current?.cesiumElement) {
@@ -120,7 +142,7 @@ function MapPage() {
       })
       .then((data) => {
         console.log(data);
-        setAirplaneData(data); // Set the received data array.
+        setAirplaneData(openSkyToAirplaneData(data)); // Set the received data array.
       })
       .catch((err) => {
         console.log(err);
@@ -144,6 +166,13 @@ function MapPage() {
           point={{ pixelSize: 10 }}
           position={Cartesian3.fromDegrees(origPos.lng, origPos.lat)} /* l(long, lat) */
         ></Entity>
+        <Entity>
+          <div>
+            {airplaneData.map((x: any, index: number) => {
+              return <Airplane key={x.Call + index.toString()} dat={x} />;
+            })}
+          </div>
+        </Entity>
       </Viewer>
     </div>
   );

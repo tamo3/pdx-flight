@@ -80,9 +80,9 @@ function HistoryPage() {
       const dst: AirplaneData = {
         Call: x.Call, // "WJA531"
         Cos: x.Cos, // At least 4 elements, lng, lat (degrees), time (UTC), alt feet(?).
+        Cou: x.Cou, // "Canada"
         From: x.From, // "CYYC Calgary, Canada"
         Icao: x.Icao, // "C03472"
-        Id: x.Id,
         Mdl: x.Mdl, // "Boeing 737NG 7CT/W"
         Op: x.Op, // "WestJet"
         OpIcao: x.OpIcao, // "WJA"

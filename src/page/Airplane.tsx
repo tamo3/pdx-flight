@@ -12,10 +12,10 @@ import { Cartesian3, Transforms, Color } from "cesium";
 // Common Airplane Data Type.
 export type AirplaneData = {
   Call: string; // "WJA531"
-  Cos: number[]; // At least 4 elements, lng, lat (degrees), time (UTC), alt feet(?).
+  Cos: number[]; // At least 4 elements, lat, lng (degrees), time (UTC), alt feet(?).
+  Cou: string; // "Canada"
   From: string; // "CYYC Calgary, Canada"
   Icao: string; // "C03472"
-  Id: number;
   Mdl: string; // "Boeing 737NG 7CT/W"
   Op: string; // "WestJet"
   OpIcao: string; // "WJA"
@@ -50,8 +50,8 @@ function randomColor(dat: any): Color {
 }
 
 export const Airplane: FC<AirplaneProps> = ({ dat, color }) => {
-  const lng = dat.Cos[1];
   const lat = dat.Cos[0];
+  const lng = dat.Cos[1];
   const high = dat.Cos[3];
   const position = Cartesian3.fromDegrees(lng, lat, high);
   const nm: string = dat.Call || "unknown";
