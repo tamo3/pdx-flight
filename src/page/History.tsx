@@ -35,7 +35,7 @@ import Cesium, {
   // Transforms,
   // Color,
 } from "cesium";
-import Airplane from "./Airplane";
+import Airplane, { AirplaneData } from "./Airplane";
 
 import "./Map.css";
 
@@ -66,13 +66,32 @@ function HistoryPage() {
   // Extracted 2016-07-01.zip -- has the data for the day, every minutes.
 
   // React Hooks:
-  const [airplaneData, setAirplaneData] = useState<any>([]); // Array of airplane data from the Server.
+  const [airplaneData, setAirplaneData] = useState<AirplaneData[]>([]); // Array of airplane data from the Server.
   const [curTime, setCurTime] = useState<number>(0); // Time as seconds from 00:00, i.e "00:03:00" => 180, "01:00" => 3600.
   const ref = useRef<CesiumComponentRef<Cesium.Viewer>>(null); // Points to Cesium.Viewer.
   const [pos2D, setPos2D] = useState<Pos2D>({
     lng: origPos.lng,
     lat: origPos.lat,
   });
+
+  // Convert JSON data from ADS-B Exchange to our format. src is an array.
+  function adsbToAirplaneData(src: any) {
+    const adat: AirplaneData[] = src.map((x: any) => {
+      const dst: AirplaneData = {
+        Call: x.Call, // "WJA531"
+        Cos: x.Cos, // At least 4 elements, lng, lat (degrees), time (UTC), alt feet(?).
+        From: x.From, // "CYYC Calgary, Canada"
+        Icao: x.Icao, // "C03472"
+        Id: x.Id,
+        Mdl: x.Mdl, // "Boeing 737NG 7CT/W"
+        Op: x.Op, // "WestJet"
+        OpIcao: x.OpIcao, // "WJA"
+        To: x.To, // "CYYJ Victoria, Canada"
+      };
+      return dst;
+    });
+    return adat;
+  }
 
   // Called ~60 times / second. Updates currentTime, which triggers redraw.
   function onTick() {
@@ -109,7 +128,7 @@ function HistoryPage() {
         })
         .then((data) => {
           //console.log(data);
-          setAirplaneData(data); // Set the received data array.
+          setAirplaneData(adsbToAirplaneData(data)); // Set the received data array.
         })
         .catch((err) => {
           console.log("Error!");
@@ -188,8 +207,8 @@ function HistoryPage() {
         /* Show FPS number */}
         <Entity>
           <div>
-            {airplaneData.map((x: any) => {
-              return <Airplane key={x.Id} dat={x} />;
+            {airplaneData.map((x: any, index: number) => {
+              return <Airplane key={x.Call + index.toString()} dat={x} />;
             })}
           </div>
         </Entity>

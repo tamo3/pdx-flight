@@ -94,7 +94,8 @@ app.get('/api/history', (req, res) => {
   let data = JSON.parse(rawData);
 
   // Filter out data:
-  // - Cos[] array has position and time. If the array length < 4, then time data must be missing, and filter out that.
+  // - Cos[] array has position and time.
+  //   TT==='a' means the 4th value is the altitude. Filter out data without the altitude.
   // - Also, if the position is outside of the circular range, filter that out.
   const inRange = data.acList.filter(x => {
     return (x.TT === 'a' && x.Cos && x.Cos.length >= 4 && InRange(x.Cos, circle));
