@@ -118,22 +118,10 @@ function MapPage() {
   const [airplaneData0, setAirplaneData0] = useState<AirplaneProps[]>([]); // Previous data.
   const prevData = useRef(airplaneData0); // Points to the previous airPlaneData, used for interpolation.
 
-  const ref = useRef<CesiumComponentRef<Cesium.Viewer>>(null); // Points to Cesium.Viewer.
   const [pos2D, setPos2D] = useState<Pos2D>({
     lng: origPos.lng,
     lat: origPos.lat,
   });
-
-  // One time initialization.
-  useEffect(() => {
-    if (ref.current?.cesiumElement) {
-      // ref.current.cesiumElement is Cesium.Viewer
-      const clockViewModel = ref.current.cesiumElement.clockViewModel;
-      const tm = clockViewModel.currentTime;
-      console.log(tm);
-      console.log(JulianDate.toDate(tm));
-    }
-  }, []);
 
   // Update count every 1 second.
   const [count, setCount] = useState(0);
@@ -161,7 +149,7 @@ function MapPage() {
   // Render.
   return (
     <div className='cesiumContainer'>
-      <Viewer ref={ref}>
+      <Viewer timeline={false} animation={false}>
         <Clock
           clockRange={ClockRange.LOOP_STOP} // loop when we hit the end time
           clockStep={ClockStep.SYSTEM_CLOCK_MULTIPLIER}
