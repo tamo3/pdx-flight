@@ -124,6 +124,7 @@ function HistoryPage() {
     }
   }, [pos2D, curTime]);
 
+  // Camera moved, update position.
   function updatePosition(percentage: number): void {
     const newPos = GetCenterPosition(refC, percentage);
     if (newPos) setPos2D(newPos);

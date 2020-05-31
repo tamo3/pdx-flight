@@ -3,7 +3,7 @@ import React, { FC, useEffect, useState, useRef } from "react";
 import {
   Viewer,
   Entity /*PointGraphics*/,
-  // Camera,
+  Camera,
   // CameraFlyTo,
   Clock,
   // Scene,
@@ -102,6 +102,7 @@ function MapPage() {
   const [airplaneData, setAirplaneData] = useState<AirplaneProps[]>([]); // Array of airplane data from the Server.
   const [airplaneData0, setAirplaneData0] = useState<AirplaneProps[]>([]); // Previous data.
   const prevData = useRef(airplaneData0); // Points to the previous airPlaneData, used for interpolation.
+  const [needFetch, setNeedFetch] = useState(false);
 
   const refC = useRef<CesiumComponentRef<Cesium.Viewer>>(null); // Points to Cesium.Viewer.
   const [pos2D, setPos2D] = useState<Pos2D>({
@@ -112,7 +113,8 @@ function MapPage() {
   // Update count every 1 second.
   const [count, setCount] = useState(0);
   useInterval(() => {
-    if (count % 10 === 0) {
+    if (needFetch || count % 10 === 0) {
+      setNeedFetch(false);
       // Since OpenSky updates data every 10 seconds, fetch only every ~10 seconds.
       const urlBase = "/api/opensky?lng=_LNG_&lat=_LAT_&range=1000000";
       const url = urlBase.replace("_LNG_", pos2D.lng.toString()).replace("_LAT_", pos2D.lat.toString());
@@ -132,10 +134,20 @@ function MapPage() {
     setCount(count + 1);
   }, 1000); // Clock tick event every 1 second.
 
+  // Camera moved, update position.
+  function updatePosition(percentage: number): void {
+    const newPos = GetCenterPosition(refC, percentage);
+    if (newPos) {
+      setPos2D(newPos);
+      setNeedFetch(true);
+    }
+  }
+
   // Render.
   return (
     <div className='cesiumContainer'>
       <Viewer ref={refC} timeline={false} animation={false}>
+        <Camera percentageChanged={0.1} onChange={updatePosition} />
         <Clock
           clockRange={ClockRange.LOOP_STOP} // loop when we hit the end time
           clockStep={ClockStep.SYSTEM_CLOCK_MULTIPLIER}
