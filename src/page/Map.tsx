@@ -3,11 +3,11 @@ import React, { FC, useEffect, useState, useRef } from "react";
 import {
   Viewer,
   Entity /*PointGraphics*/,
-  Camera,
-  CameraFlyTo,
+  // Camera,
+  // CameraFlyTo,
   Clock,
   // Scene,
-  Globe,
+  // Globe,
   CesiumComponentRef,
   // Model,
   // ModelGraphics,
@@ -18,7 +18,7 @@ import {
 } from "resium";
 import Cesium, {
   Camera as CCamera,
-  Cartesian2,
+  // Cartesian2,
   Cartesian3,
   // ClockViewModel,
   JulianDate,
@@ -29,7 +29,7 @@ import Cesium, {
   // Transforms,
   // Color,
 } from "cesium";
-import Airplane, { AirplaneData } from "./Airplane";
+import Airplane, { AirplaneProps } from "./Airplane";
 
 import "./Map.css";
 
@@ -38,12 +38,8 @@ type Pos2D = {
   lng: number;
 };
 
-export const historyOfDate = "2016-07-01"; // This must match with the data file names served by node server (i.e 2016-07-01-nnnnZ.json, etc)
-
 const origPos: Pos2D = { lat: 45.5895, lng: -122.595172 }; // PDX.
-const cameraDest = Cartesian3.fromDegrees(origPos.lng, origPos.lat, 250000);
-// const origPos: Pos2D = {lat:33.974, lng:-118.322}; // LA
-// const position = Cartesian3.fromDegrees(origPos.lng, origPos.lat, 100);
+// const cameraDest = Cartesian3.fromDegrees(origPos.lng, origPos.lat, 250000);
 const delta = 1.2;
 const camHome = Rectangle.fromDegrees(
   origPos.lng - delta,
@@ -58,7 +54,7 @@ CCamera.DEFAULT_VIEW_FACTOR = 0;
 // Custom Hook to generate clock tick event.
 // From: https://overreacted.io/making-setinterval-declarative-with-react-hooks/
 // Cesium has its own clock tick but it is too fast (every 1/60 sec) for this page.
-const useInterval = (callback: any, delay: number) => {
+function useInterval(callback: any, delay: number) {
   const savedCallback: any = useRef();
   useEffect(() => {
     savedCallback.current = callback;
@@ -73,45 +69,65 @@ const useInterval = (callback: any, delay: number) => {
       return () => clearInterval(id);
     }
   }, [delay]);
-};
+}
 
+// Convert JSON data from OpenSky to our format. src is a 2D array.
+function openSkyToAirplaneProps(srcJson: any, count: number): AirplaneProps[] {
+  const src = srcJson.states;
+  const props: AirplaneProps[] = src.map((x: any) => {
+    const alt: number = (x[13] ?? x[7] ?? 0) * 3.28; // meter => feet.
+    const cos: number[] = [x[6], x[5], x[3], alt]; // lat, lng, time, alt.
+    const dst: AirplaneProps = {
+      Call: x[1], // "WJA531"
+      Cos: cos, // At least 4 elements, lat, lng (degrees), time (UTC), alt feet(?).
+      Cou: x[2],
+      From: "unknown", // "CYYC Calgary, Canada"
+      Icao: x[0], // "C03472"
+      Mdl: "unknown", // "Boeing 737NG 7CT/W"
+      Op: "unknown", // "WestJet"
+      OpIcao: x.OpIcao, // "WJA"
+      To: "unknown", // "CYYJ Victoria, Canada"
+      MyCnt: count,
+    };
+    return dst;
+  });
+  return props;
+}
+
+// Calculate the position of the airplane at current time (for each second) by linear interpolation.
+// NOTE: airplane data is update every 10 seconds.
+function interpolatePosition(x: AirplaneProps, prevData: AirplaneProps[], count: number): AirplaneProps {
+  const prev: AirplaneProps[] = prevData.filter((a) => (a.Call === x.Call ? a : null)); // Find the previous data of the same airplane.
+  if (!prev || prev.length === 0) return x; // If no previous data found, then just return the current one.
+  const n = x.MyCnt - prev[0].MyCnt; // Count value difference.
+  let i = count - x.MyCnt; // Where are we in 'n' counts.
+  if (i > n) i = n; // Limit to [0...n]/
+  if (i < 0) i = 0;
+  // Interpolate lat, lng, time (ignored) and alt.
+  const cos = x.Cos.map((a, idx) => ((a - prev[0].Cos[idx]) * i) / n + prev[0].Cos[idx]);
+  let props = { ...x }; // Clone x to new props.
+  props.Cos = cos;
+  // if (x.Call === "CMD3    ") console.log(`${count} prev ${prev[0].Cos[0]}  x${x.Cos[0]} ${i}/${n} ${props.Cos[0]}`);
+  return props;
+}
+
+// Map page component.
 function MapPage() {
   // React Hooks:
-  const [airplaneData, setAirplaneData] = useState<any>([]); // Array of airplane data from the Server.
-  const [curTime, setCurTime] = useState<number>(0); // Time as seconds from 00:00, i.e "00:03:00" => 180, "01:00" => 3600.
+  const [airplaneData, setAirplaneData] = useState<AirplaneProps[]>([]); // Array of airplane data from the Server.
+  const [airplaneData0, setAirplaneData0] = useState<AirplaneProps[]>([]); // Previous data.
+  const prevData = useRef(airplaneData0); // Points to the previous airPlaneData, used for interpolation.
+
   const ref = useRef<CesiumComponentRef<Cesium.Viewer>>(null); // Points to Cesium.Viewer.
   const [pos2D, setPos2D] = useState<Pos2D>({
     lng: origPos.lng,
     lat: origPos.lat,
   });
 
-  // Convert JSON data from OpenSky to our format. src is a 2D array.
-  function openSkyToAirplaneData(srcJson: any) {
-    const src = srcJson.states;
-    const adat: AirplaneData[] = src.map((x: any) => {
-      const alt: number = (x[13] ?? x[7] ?? 0) * 3.28; // meter => feet.
-      const cos: number[] = [x[6], x[5], 0, alt];
-      const dst: AirplaneData = {
-        Call: x[1], // "WJA531"
-        Cos: cos, // At least 4 elements, lat, lng (degrees), time (UTC), alt feet(?).
-        Cou: x[2],
-        From: "unknown", // "CYYC Calgary, Canada"
-        Icao: x[0], // "C03472"
-        Mdl: "unknown", // "Boeing 737NG 7CT/W"
-        Op: "unknown", // "WestJet"
-        OpIcao: x.OpIcao, // "WJA"
-        To: "unknown", // "CYYJ Victoria, Canada"
-      };
-      return dst;
-    });
-    return adat;
-  }
-
   // One time initialization.
   useEffect(() => {
     if (ref.current?.cesiumElement) {
       // ref.current.cesiumElement is Cesium.Viewer
-      // DO SOMETHING
       const clockViewModel = ref.current.cesiumElement.clockViewModel;
       const tm = clockViewModel.currentTime;
       console.log(tm);
@@ -119,39 +135,32 @@ function MapPage() {
     }
   }, []);
 
-  // Parse JSON from
-  const UpdateAirplanePositions = (x: any) => {};
-
-  const [apiUpdateTick, setApiUpdateTick] = useState(0);
+  // Update count every 1 second.
   const [count, setCount] = useState(0);
   useInterval(() => {
-    if (count % 10 == 0) {
-      // OpenSky API with anonymous access updates data every 10 seconds.
-      setApiUpdateTick((c) => c + 1); // Update apiUpdateTick.
+    if (count % 10 === 0) {
+      // Since OpenSky updates data every 10 seconds, fetch only every ~10 seconds.
+      const urlBase = "/api/opensky?lng=_LNG_&lat=_LAT_&range=1000000";
+      const url = urlBase.replace("_LNG_", pos2D.lng.toString()).replace("_LAT_", pos2D.lat.toString());
+      fetch(url)
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          console.log(data);
+          prevData.current = airplaneData; // Save the current data.
+          setAirplaneData(openSkyToAirplaneProps(data, count)); // Set the received data array.
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
     setCount(count + 1);
   }, 1000); // Clock tick event every 1 second.
 
-  // Fetch data from API via node server.
-  useEffect(() => {
-    const urlBase = "/api/opensky?lng=_LNG_&lat=_LAT_&range=1000000";
-    const url = urlBase.replace("_LNG_", pos2D.lng.toString()).replace("_LAT_", pos2D.lat.toString());
-    fetch(url)
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        console.log(data);
-        setAirplaneData(openSkyToAirplaneData(data)); // Set the received data array.
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, [pos2D, apiUpdateTick]);
-
+  // Render.
   return (
     <div className='cesiumContainer'>
-      <h3>Count : {count}</h3>
       <Viewer ref={ref}>
         <Clock
           clockRange={ClockRange.LOOP_STOP} // loop when we hit the end time
@@ -169,11 +178,13 @@ function MapPage() {
         <Entity>
           <div>
             {airplaneData.map((x: any, index: number) => {
-              return <Airplane key={x.Call + index.toString()} dat={x} />;
+              const a = interpolatePosition(x, prevData.current, count);
+              return <Airplane key={a.Call + index.toString()} dat={a} />;
             })}
           </div>
         </Entity>
       </Viewer>
+      <p>Count : {count}</p>
     </div>
   );
 }

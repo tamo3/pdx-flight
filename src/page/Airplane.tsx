@@ -2,15 +2,15 @@ import React, { FC } from "react";
 import {
   Entity,
   PointGraphics,
-  RectangleGraphics,
-  EntityStaticDescription,
+  // RectangleGraphics,
+  // EntityStaticDescription,
   // BoxGraphics,
   // EllipseGraphics,
 } from "resium";
-import { Cartesian3, Transforms, Color } from "cesium";
+import { Cartesian3, Color } from "cesium";
 
 // Common Airplane Data Type.
-export type AirplaneData = {
+export type AirplaneProps = {
   Call: string; // "WJA531"
   Cos: number[]; // At least 4 elements, lat, lng (degrees), time (UTC), alt feet(?).
   Cou: string; // "Canada"
@@ -20,14 +20,15 @@ export type AirplaneData = {
   Op: string; // "WestJet"
   OpIcao: string; // "WJA"
   To: string; // "CYYJ Victoria, Canada"
+  MyCnt: number; // Our internal use (for MAP interpolationO).
 };
 
-type AirplaneProps = {
-  dat: any; // JSON data from node server.
-  color?: Color;
+type AirplaneArgs = {
+  dat: AirplaneProps; // JSON data from node server.
+  color?: Color; // Optional color.
 };
 
-// Generate random value base on the input integer.
+// Generate random value base on the input integer. Returns the same random value for the same input number.
 function xorshift32(v: number) {
   const UINT32_MAX_NEXT = 2 ** 32;
   v = v ^ (v << 13);
@@ -39,7 +40,7 @@ function xorshift32(v: number) {
 // Generate random color based on the 'Call' -- will have the same color for the same Call number.
 function randomColor(dat: any): Color {
   function randomColor(id: number): Color {
-    const r = xorshift32(id * 3 + 23) / 2 + 0.499; // Makes the dots slightly brighter, reddish.
+    const r = xorshift32(id * 3 + 23) / 2 + 0.499; // Makes the dot slightly brighter, reddish so that it standout from background.
     const g = xorshift32(id * 7 + 13);
     const b = xorshift32(id) * 13 * 17;
     return new Color(r, g, b); // Color R,G,B = [0..1].
@@ -49,7 +50,7 @@ function randomColor(dat: any): Color {
   return randomColor(h);
 }
 
-export const Airplane: FC<AirplaneProps> = ({ dat, color }) => {
+export const Airplane: FC<AirplaneArgs> = ({ dat, color }) => {
   const lat = dat.Cos[0];
   const lng = dat.Cos[1];
   const high = dat.Cos[3];
@@ -57,7 +58,7 @@ export const Airplane: FC<AirplaneProps> = ({ dat, color }) => {
   const nm: string = dat.Call || "unknown";
   const desc = `<p>From: ${dat.From}<br>To: ${dat.To}<br>Model: ${dat.Mdl}</p>`;
   const colr = color || randomColor(dat);
-  const obj: any =
+  const dot: any =
     dat.Call && dat.To ? (
       <PointGraphics color={colr} pixelSize={12} />
     ) : (
@@ -70,7 +71,7 @@ export const Airplane: FC<AirplaneProps> = ({ dat, color }) => {
     <div>
       <Entity name={nm} description={desc} position={position}>
         {/* <EllipseGraphics semiMajorAxis={100} semiMinorAxis={100} height={500} material={Color.CYAN} /> */}
-        {obj}
+        {dot}
       </Entity>
     </div>
   );

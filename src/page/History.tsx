@@ -35,7 +35,7 @@ import Cesium, {
   // Transforms,
   // Color,
 } from "cesium";
-import Airplane, { AirplaneData } from "./Airplane";
+import Airplane, { AirplaneProps } from "./Airplane";
 
 import "./Map.css";
 
@@ -66,7 +66,7 @@ function HistoryPage() {
   // Extracted 2016-07-01.zip -- has the data for the day, every minutes.
 
   // React Hooks:
-  const [airplaneData, setAirplaneData] = useState<AirplaneData[]>([]); // Array of airplane data from the Server.
+  const [airplaneData, setAirplaneData] = useState<AirplaneProps[]>([]); // Array of airplane data from the Server.
   const [curTime, setCurTime] = useState<number>(0); // Time as seconds from 00:00, i.e "00:03:00" => 180, "01:00" => 3600.
   const ref = useRef<CesiumComponentRef<Cesium.Viewer>>(null); // Points to Cesium.Viewer.
   const [pos2D, setPos2D] = useState<Pos2D>({
@@ -75,9 +75,9 @@ function HistoryPage() {
   });
 
   // Convert JSON data from ADS-B Exchange to our format. src is an array.
-  function adsbToAirplaneData(src: any) {
-    const adat: AirplaneData[] = src.map((x: any) => {
-      const dst: AirplaneData = {
+  function adsbToAirplaneProps(src: any): AirplaneProps[] {
+    const props: AirplaneProps[] = src.map((x: any) => {
+      const dst: AirplaneProps = {
         Call: x.Call, // "WJA531"
         Cos: x.Cos, // At least 4 elements, lng, lat (degrees), time (UTC), alt feet(?).
         Cou: x.Cou, // "Canada"
@@ -87,10 +87,11 @@ function HistoryPage() {
         Op: x.Op, // "WestJet"
         OpIcao: x.OpIcao, // "WJA"
         To: x.To, // "CYYJ Victoria, Canada"
+        MyCnt: 0,
       };
       return dst;
     });
-    return adat;
+    return props;
   }
 
   // Called ~60 times / second. Updates currentTime, which triggers redraw.
@@ -128,7 +129,7 @@ function HistoryPage() {
         })
         .then((data) => {
           //console.log(data);
-          setAirplaneData(adsbToAirplaneData(data)); // Set the received data array.
+          setAirplaneData(adsbToAirplaneProps(data)); // Set the received data array.
         })
         .catch((err) => {
           console.log("Error!");
@@ -138,15 +139,13 @@ function HistoryPage() {
   }, [pos2D, curTime]);
 
   // https://stackoverflow.com/questions/33348761/get-center-in-cesium-map
-  let getCnt = 0;
   function getPosition(percentage: number) {
     try {
-      let currentTime = getCnt++;
-      if (currentTime !== 0 && ref.current?.cesiumElement) {
+      if (ref.current?.cesiumElement) {
         const viewer = ref.current?.cesiumElement;
-        let lat: number = origPos.lat;
-        let lng: number = origPos.lng;
         if (viewer.scene) {
+          let lat: number = origPos.lat;
+          let lng: number = origPos.lng;
           if (viewer.scene.mode === 3) {
             const windowPosition = new Cartesian2(viewer.container.clientWidth / 2, viewer.container.clientHeight / 2);
             const pickRay = viewer.scene.camera.getPickRay(windowPosition);
@@ -171,8 +170,7 @@ function HistoryPage() {
   // Init Clock component.
   useEffect(() => {
     if (ref.current?.cesiumElement) {
-      // Make sure Viewer is mounted.
-      // ref.current.cesiumElement is Cesium.Viewer
+      // Make sure Viewer is mounted. ref.current.cesiumElement is Cesium.Viewer
 
       // Initialize the Clock/Animation Widget.
       const clock = ref.current.cesiumElement.clockViewModel;
@@ -189,10 +187,6 @@ function HistoryPage() {
       // Initialize timeLine Widget at the bottom.
       const timeLine = ref.current.cesiumElement.timeline;
       timeLine.zoomTo(clock.startTime, clock.stopTime);
-
-      // const camera = ref.current.cesiumElement.camera;
-      // camera.changed.addEventListener(getPosition);
-      // camera.percentageChanged = 0.1;
     }
   }, []); // ESlint complains about this (add onTick, etc), but if you do so, then things don't work well.
   // I think it is OK because this is a one time initialization.
