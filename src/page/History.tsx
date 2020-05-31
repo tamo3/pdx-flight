@@ -39,10 +39,42 @@ import Airplane, { AirplaneProps } from "./Airplane";
 
 import "./Map.css";
 
-type Pos2D = {
+export type Pos2D = {
   lat: number;
   lng: number;
 };
+
+// Get center in Cesium Map.
+// https://stackoverflow.com/questions/33348761/get-center-in-cesium-map
+export function GetCenterPosition(ref: any, percentage: number): Pos2D | null {
+  try {
+    if (ref.current?.cesiumElement) {
+      const viewer = ref.current?.cesiumElement;
+      if (viewer.scene) {
+        let lat: number = origPos.lat;
+        let lng: number = origPos.lng;
+        if (viewer.scene.mode === 3) {
+          const windowPosition = new Cartesian2(viewer.container.clientWidth / 2, viewer.container.clientHeight / 2);
+          const pickRay = viewer.scene.camera.getPickRay(windowPosition);
+          const pickPosition = viewer.scene.globe.pick(pickRay, viewer.scene); // pickPosition can be undefined.
+          const pickPositionCartographic = viewer.scene.globe.ellipsoid.cartesianToCartographic(pickPosition);
+          lng = pickPositionCartographic.longitude * (180 / Math.PI);
+          lat = pickPositionCartographic.latitude * (180 / Math.PI);
+        } else if (viewer.scene.mode === 2) {
+          const camPos = viewer.camera.positionCartographic;
+          lng = camPos.longitude * (180 / Math.PI);
+          lat = camPos.latitude * (180 / Math.PI);
+        }
+        console.log({ lng, lat });
+        // setPos2D({ lng, lat });
+        return { lng, lat };
+      }
+    }
+  } catch (error) {
+    console.log(error);
+  }
+  return null;
+}
 
 export const historyOfDate = "2016-07-01"; // This must match with the data file names served by node server (i.e 2016-07-01-nnnnZ.json, etc)
 
@@ -61,6 +93,7 @@ const camHome = Rectangle.fromDegrees(
 CCamera.DEFAULT_VIEW_RECTANGLE = camHome;
 CCamera.DEFAULT_VIEW_FACTOR = 0;
 
+// History Page component.
 function HistoryPage() {
   // Server Access URL template: Files are from  https://history.adsbexchange.com/downloads/samples/
   // Extracted 2016-07-01.zip -- has the data for the day, every minutes.
@@ -87,7 +120,7 @@ function HistoryPage() {
         Op: x.Op, // "WestJet"
         OpIcao: x.OpIcao, // "WJA"
         To: x.To, // "CYYJ Victoria, Canada"
-        MyCnt: 0,
+        MyCnt: 0, // Not used by History page.
       };
       return dst;
     });
@@ -138,33 +171,9 @@ function HistoryPage() {
     }
   }, [pos2D, curTime]);
 
-  // https://stackoverflow.com/questions/33348761/get-center-in-cesium-map
-  function getPosition(percentage: number) {
-    try {
-      if (ref.current?.cesiumElement) {
-        const viewer = ref.current?.cesiumElement;
-        if (viewer.scene) {
-          let lat: number = origPos.lat;
-          let lng: number = origPos.lng;
-          if (viewer.scene.mode === 3) {
-            const windowPosition = new Cartesian2(viewer.container.clientWidth / 2, viewer.container.clientHeight / 2);
-            const pickRay = viewer.scene.camera.getPickRay(windowPosition);
-            const pickPosition = viewer.scene.globe.pick(pickRay, viewer.scene); // pickPosition can be undefined.
-            const pickPositionCartographic = viewer.scene.globe.ellipsoid.cartesianToCartographic(pickPosition);
-            lng = pickPositionCartographic.longitude * (180 / Math.PI);
-            lat = pickPositionCartographic.latitude * (180 / Math.PI);
-          } else if (viewer.scene.mode === 2) {
-            const camPos = viewer.camera.positionCartographic;
-            lng = camPos.longitude * (180 / Math.PI);
-            lat = camPos.latitude * (180 / Math.PI);
-          }
-          console.log({ lng, lat });
-          setPos2D({ lng, lat });
-        }
-      }
-    } catch (error) {
-      console.log(error);
-    }
+  function updatePosition(percentage: number): void {
+    const newPos = GetCenterPosition(ref, percentage);
+    if (newPos) setPos2D(newPos);
   }
 
   // Init Clock component.
@@ -194,7 +203,7 @@ function HistoryPage() {
   return (
     <div className='cesiumContainer'>
       <Viewer ref={ref}>
-        <Camera percentageChanged={0.1} onChange={getPosition} />
+        <Camera percentageChanged={0.1} onChange={updatePosition} />
         {/* once = Move camera only once */}
         <CameraFlyTo destination={cameraDest} duration={0} once={true} />
         {/* <Scene debugShowFramesPerSecond={true} /> */
