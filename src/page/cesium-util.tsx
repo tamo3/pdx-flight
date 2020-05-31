@@ -77,3 +77,5 @@ export function GetCenterPosition(refC: any, percentage: number): Pos2D | null {
   }
   return null;
 }
+
+// https://opensky-network.org/api/flights/aircraft?begin=1517184000&end=1517270400&icao24=a1c0fb

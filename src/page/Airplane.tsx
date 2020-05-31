@@ -55,7 +55,7 @@ export const Airplane: FC<AirplaneArgs> = ({ dat, color }) => {
   const lng = dat.Cos[1];
   const high = dat.Cos[3];
   const position = Cartesian3.fromDegrees(lng, lat, high);
-  const nm: string = dat.Call || "unknown";
+  const nm: string = (dat.Call || "unknown") + `(${dat.Icao || ""})`;
   const desc = `<p>From: ${dat.From}<br>To: ${dat.To}<br>Model: ${dat.Mdl}</p>`;
   const colr = color || randomColor(dat);
   const dot: any =
