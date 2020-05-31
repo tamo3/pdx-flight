@@ -30,25 +30,10 @@ import Cesium, {
   // Color,
 } from "cesium";
 import Airplane, { AirplaneProps } from "./Airplane";
-
+import { Pos2D, OriginalPos, CameraHome, GetCenterPosition } from "./cesium-util";
 import "./Map.css";
 
-type Pos2D = {
-  lat: number;
-  lng: number;
-};
-
-const origPos: Pos2D = { lat: 45.5895, lng: -122.595172 }; // PDX.
-// const cameraDest = Cartesian3.fromDegrees(origPos.lng, origPos.lat, 250000);
-const delta = 1.2;
-const camHome = Rectangle.fromDegrees(
-  origPos.lng - delta,
-  origPos.lat - delta,
-  origPos.lng + delta,
-  origPos.lat + delta
-);
-// const camHome = Rectangle.fromDegrees(117.940573, -29.808406, 118.313421, -29.468825);
-CCamera.DEFAULT_VIEW_RECTANGLE = camHome;
+CCamera.DEFAULT_VIEW_RECTANGLE = CameraHome;
 CCamera.DEFAULT_VIEW_FACTOR = 0;
 
 // Custom Hook to generate clock tick event.
@@ -118,9 +103,10 @@ function MapPage() {
   const [airplaneData0, setAirplaneData0] = useState<AirplaneProps[]>([]); // Previous data.
   const prevData = useRef(airplaneData0); // Points to the previous airPlaneData, used for interpolation.
 
+  const refC = useRef<CesiumComponentRef<Cesium.Viewer>>(null); // Points to Cesium.Viewer.
   const [pos2D, setPos2D] = useState<Pos2D>({
-    lng: origPos.lng,
-    lat: origPos.lat,
+    lng: OriginalPos.lng,
+    lat: OriginalPos.lat,
   });
 
   // Update count every 1 second.
@@ -149,7 +135,7 @@ function MapPage() {
   // Render.
   return (
     <div className='cesiumContainer'>
-      <Viewer timeline={false} animation={false}>
+      <Viewer ref={refC} timeline={false} animation={false}>
         <Clock
           clockRange={ClockRange.LOOP_STOP} // loop when we hit the end time
           clockStep={ClockStep.SYSTEM_CLOCK_MULTIPLIER}
@@ -161,7 +147,7 @@ function MapPage() {
           description='Portland International Airport'
           name='PDX Airport'
           point={{ pixelSize: 10 }}
-          position={Cartesian3.fromDegrees(origPos.lng, origPos.lat)} /* l(long, lat) */
+          position={Cartesian3.fromDegrees(OriginalPos.lng, OriginalPos.lat)} /* l(long, lat) */
         ></Entity>
         <Entity>
           <div>

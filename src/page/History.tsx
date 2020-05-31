@@ -36,61 +36,14 @@ import Cesium, {
   // Color,
 } from "cesium";
 import Airplane, { AirplaneProps } from "./Airplane";
-
+import { Pos2D, OriginalPos, CameraHome, GetCenterPosition } from "./cesium-util";
 import "./Map.css";
-
-export type Pos2D = {
-  lat: number;
-  lng: number;
-};
-
-// Get center in Cesium Map.
-// https://stackoverflow.com/questions/33348761/get-center-in-cesium-map
-export function GetCenterPosition(ref: any, percentage: number): Pos2D | null {
-  try {
-    if (ref.current?.cesiumElement) {
-      const viewer = ref.current?.cesiumElement;
-      if (viewer.scene) {
-        let lat: number = origPos.lat;
-        let lng: number = origPos.lng;
-        if (viewer.scene.mode === 3) {
-          const windowPosition = new Cartesian2(viewer.container.clientWidth / 2, viewer.container.clientHeight / 2);
-          const pickRay = viewer.scene.camera.getPickRay(windowPosition);
-          const pickPosition = viewer.scene.globe.pick(pickRay, viewer.scene); // pickPosition can be undefined.
-          const pickPositionCartographic = viewer.scene.globe.ellipsoid.cartesianToCartographic(pickPosition);
-          lng = pickPositionCartographic.longitude * (180 / Math.PI);
-          lat = pickPositionCartographic.latitude * (180 / Math.PI);
-        } else if (viewer.scene.mode === 2) {
-          const camPos = viewer.camera.positionCartographic;
-          lng = camPos.longitude * (180 / Math.PI);
-          lat = camPos.latitude * (180 / Math.PI);
-        }
-        console.log({ lng, lat });
-        // setPos2D({ lng, lat });
-        return { lng, lat };
-      }
-    }
-  } catch (error) {
-    console.log(error);
-  }
-  return null;
-}
 
 export const historyOfDate = "2016-07-01"; // This must match with the data file names served by node server (i.e 2016-07-01-nnnnZ.json, etc)
 
-const origPos: Pos2D = { lat: 45.5895, lng: -122.595172 }; // PDX.
-const cameraDest = Cartesian3.fromDegrees(origPos.lng, origPos.lat, 250000);
-// const origPos: Pos2D = {lat:33.974, lng:-118.322}; // LA
+const cameraDest = Cartesian3.fromDegrees(OriginalPos.lng, OriginalPos.lat, 250000);
 // const position = Cartesian3.fromDegrees(origPos.lng, origPos.lat, 100);
-const delta = 1.2;
-const camHome = Rectangle.fromDegrees(
-  origPos.lng - delta,
-  origPos.lat - delta,
-  origPos.lng + delta,
-  origPos.lat + delta
-);
-// const camHome = Rectangle.fromDegrees(117.940573, -29.808406, 118.313421, -29.468825);
-CCamera.DEFAULT_VIEW_RECTANGLE = camHome;
+CCamera.DEFAULT_VIEW_RECTANGLE = CameraHome;
 CCamera.DEFAULT_VIEW_FACTOR = 0;
 
 // History Page component.
@@ -101,10 +54,10 @@ function HistoryPage() {
   // React Hooks:
   const [airplaneData, setAirplaneData] = useState<AirplaneProps[]>([]); // Array of airplane data from the Server.
   const [curTime, setCurTime] = useState<number>(0); // Time as seconds from 00:00, i.e "00:03:00" => 180, "01:00" => 3600.
-  const ref = useRef<CesiumComponentRef<Cesium.Viewer>>(null); // Points to Cesium.Viewer.
+  const refC = useRef<CesiumComponentRef<Cesium.Viewer>>(null); // Points to Cesium.Viewer.
   const [pos2D, setPos2D] = useState<Pos2D>({
-    lng: origPos.lng,
-    lat: origPos.lat,
+    lng: OriginalPos.lng,
+    lat: OriginalPos.lat,
   });
 
   // Convert JSON data from ADS-B Exchange to our format. src is an array.
@@ -130,9 +83,9 @@ function HistoryPage() {
   // Called ~60 times / second. Updates currentTime, which triggers redraw.
   function onTick() {
     let currentTime = curTime;
-    if (ref.current?.cesiumElement) {
+    if (refC.current?.cesiumElement) {
       // Make sure Viewer is mounted.
-      const clockViewModel = ref.current.cesiumElement.clockViewModel;
+      const clockViewModel = refC.current.cesiumElement.clockViewModel;
       const tm = clockViewModel.currentTime;
       // console.log(tm); console.log(JulianDate.toIso8601(tm, 0)); // => "2016-07-01T00:00:00Z"
       const t = JulianDate.toIso8601(tm, 0).match(/[0-9][0-9]:/g);
@@ -172,17 +125,17 @@ function HistoryPage() {
   }, [pos2D, curTime]);
 
   function updatePosition(percentage: number): void {
-    const newPos = GetCenterPosition(ref, percentage);
+    const newPos = GetCenterPosition(refC, percentage);
     if (newPos) setPos2D(newPos);
   }
 
   // Init Clock component.
   useEffect(() => {
-    if (ref.current?.cesiumElement) {
+    if (refC.current?.cesiumElement) {
       // Make sure Viewer is mounted. ref.current.cesiumElement is Cesium.Viewer
 
       // Initialize the Clock/Animation Widget.
-      const clock = ref.current.cesiumElement.clockViewModel;
+      const clock = refC.current.cesiumElement.clockViewModel;
       // const tm = clock.currentTime; console.log(tm); console.log(JulianDate.toDate(tm));
       clock.currentTime = JulianDate.fromIso8601(historyOfDate);
       clock.startTime = JulianDate.fromIso8601(historyOfDate);
@@ -194,7 +147,7 @@ function HistoryPage() {
       // shouldAnimate // Animation is turned off at page load.
 
       // Initialize timeLine Widget at the bottom.
-      const timeLine = ref.current.cesiumElement.timeline;
+      const timeLine = refC.current.cesiumElement.timeline;
       timeLine.zoomTo(clock.startTime, clock.stopTime);
     }
   }, []); // ESlint complains about this (add onTick, etc), but if you do so, then things don't work well.
@@ -202,7 +155,7 @@ function HistoryPage() {
 
   return (
     <div className='cesiumContainer'>
-      <Viewer ref={ref}>
+      <Viewer ref={refC}>
         <Camera percentageChanged={0.1} onChange={updatePosition} />
         {/* once = Move camera only once */}
         <CameraFlyTo destination={cameraDest} duration={0} once={true} />
