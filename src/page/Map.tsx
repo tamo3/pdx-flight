@@ -24,11 +24,15 @@ import Cesium, {
   Camera as CCamera,
   // Cartesian2,
   Cartesian3,
+  Color,
   // ClockViewModel,
   JulianDate,
   ClockRange,
   ClockStep,
+  PinBuilder,
   Rectangle,
+  Billboard,
+  VerticalOrigin,
   // Timeline,
   // Transforms,
   // Color,
@@ -161,24 +165,43 @@ function MapPage() {
     }
   }
 
+  // Initialize once.
+  useEffect(() => {
+    if (refC.current?.cesiumElement) {
+      // Make sure Viewer is mounted. ref.current.cesiumElement is Cesium.Viewer
+      // Change map surface to Bing street map.
+      const baseLayerPickerViewModel = refC.current.cesiumElement.baseLayerPicker.viewModel;
+      baseLayerPickerViewModel.selectedImagery = baseLayerPickerViewModel.imageryProviderViewModels[2];
+    }
+  }, []);
+
+  // This worked!
+  // from: https://sandcastle.cesium.com/?src=Map%20Pins.html
+  const pinBuilder = new PinBuilder();
+  const bb: any = {
+    image: pinBuilder.fromText("?", Color.BLACK, 48).toDataURL(),
+    verticalOrigin: VerticalOrigin.BOTTOM,
+  };
+
   // Render.
   return (
     <div className='cesiumContainer'>
       <Viewer ref={refC} timeline={false} animation={false}>
         <Camera percentageChanged={0.1} onChange={updatePosition} />
-        <Clock
+        {/* <Clock
           clockRange={ClockRange.LOOP_STOP} // loop when we hit the end time
           clockStep={ClockStep.SYSTEM_CLOCK_MULTIPLIER}
           // onTick={onTick}
           multiplier={30} // how much time to advance each tick
           // shouldAnimate // Animation on by default
-        />
+        /> */}
         <Entity
           description='Portland International Airport'
           name='PDX Airport'
-          point={{ pixelSize: 10 }}
-          position={Cartesian3.fromDegrees(OriginalPos.lng, OriginalPos.lat)} /* l(long, lat) */
-        ></Entity>
+          billboard={bb}
+          // billboard={{ image: "download.png", show: true, scale: 10, width: 100, height: 100, color: Color.LIME }}
+          // point={{ pixelSize: 10 }}
+          position={Cartesian3.fromDegrees(OriginalPos.lng, OriginalPos.lat)}></Entity>
         <Entity>
           <div>
             {airplaneData.map((x: any, index: number) => {
