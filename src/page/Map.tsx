@@ -1,3 +1,7 @@
+///////////////////////////////////////////////////////////////////////////////
+// Display Realtime Airplane Positions
+///////////////////////////////////////////////////////////////////////////////
+
 import React, { FC, useEffect, useState, useRef } from "react";
 // import ReactDOM from 'react-dom';
 import {
@@ -36,6 +40,13 @@ import "./Map.css";
 CCamera.DEFAULT_VIEW_RECTANGLE = CameraHome;
 CCamera.DEFAULT_VIEW_FACTOR = 0;
 
+function shallowEqual(obj1: any, obj2: any): boolean {
+  return (
+    Object.keys(obj1).length === Object.keys(obj2).length &&
+    Object.keys(obj1).every((key) => obj2.hasOwnProperty(key) && obj1[key] === obj2[key])
+  );
+}
+
 // Custom Hook to generate clock tick event.
 // From: https://overreacted.io/making-setinterval-declarative-with-react-hooks/
 // Cesium has its own clock tick but it is too fast (every 1/60 sec) for this page.
@@ -70,20 +81,26 @@ function openSkyToAirplaneProps(srcJson: any, count: number): AirplaneProps[] {
       Icao: x[0], // "C03472"
       Mdl: "unknown", // "Boeing 737NG 7CT/W"
       Op: "unknown", // "WestJet"
-      OpIcao: x.OpIcao, // "WJA"
       To: "unknown", // "CYYJ Victoria, Canada"
+      PosTime: x[4],
       MyCnt: count,
     };
     return dst;
   });
-  return props;
+  // Remove duplicated Call-sign entries: https://medium.com/dailyjs/how-to-remove-array-duplicates-in-es6-5daa8789641c
+  const callArray = props.map((x) => x.Call);
+  const uniqueProps = props.filter((x, index) => callArray.indexOf(x.Call) === index);
+  return uniqueProps;
 }
 
 // Calculate the position of the airplane at current time (for each second) by linear interpolation.
 // NOTE: airplane data is update every 10 seconds.
 function interpolatePosition(x: AirplaneProps, prevData: AirplaneProps[], count: number): AirplaneProps {
   const prev: AirplaneProps[] = prevData.filter((a) => (a.Call === x.Call ? a : null)); // Find the previous data of the same airplane.
-  if (!prev || prev.length === 0) return x; // If no previous data found, then just return the current one.
+  if (!prev || prev.length === 0) {
+    console.log(`prev is ${prev}`);
+    return x; // If no previous data found, then just return the current one.
+  }
   const n = x.MyCnt - prev[0].MyCnt; // Count value difference.
   let i = count - x.MyCnt; // Where are we in 'n' counts.
   if (i > n) i = n; // Limit to [0...n]/
@@ -92,7 +109,7 @@ function interpolatePosition(x: AirplaneProps, prevData: AirplaneProps[], count:
   const cos = x.Cos.map((a, idx) => ((a - prev[0].Cos[idx]) * i) / n + prev[0].Cos[idx]);
   let props = { ...x }; // Clone x to new props.
   props.Cos = cos;
-  // if (x.Call === "CMD3    ") console.log(`${count} prev ${prev[0].Cos[0]}  x${x.Cos[0]} ${i}/${n} ${props.Cos[0]}`);
+  if (x.Call === "CGVJK   ") console.log(`${count} prev ${prev[0].Cos[0]}  x${x.Cos[0]} ${i}/${n} ${props.Cos[0]}`);
   return props;
 }
 
@@ -124,7 +141,7 @@ function MapPage() {
         })
         .then((data) => {
           console.log(data);
-          prevData.current = airplaneData; // Save the current data.
+          if (!shallowEqual(prevData.current, airplaneData)) prevData.current = airplaneData; // Save the current data.
           setAirplaneData(openSkyToAirplaneProps(data, count)); // Set the received data array.
         })
         .catch((err) => {
@@ -140,6 +157,7 @@ function MapPage() {
     if (newPos) {
       setPos2D(newPos);
       setNeedFetch(true);
+      // setCount(((count + 9) / 10) * 10);
     }
   }
 
@@ -165,7 +183,7 @@ function MapPage() {
           <div>
             {airplaneData.map((x: any, index: number) => {
               const a = interpolatePosition(x, prevData.current, count);
-              return <Airplane key={a.Call + index.toString()} dat={a} />;
+              return <Airplane key={a.Call ?? index.toString()} dat={a} />;
             })}
           </div>
         </Entity>

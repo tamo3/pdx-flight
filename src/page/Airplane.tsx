@@ -1,4 +1,8 @@
-import React, { FC } from "react";
+///////////////////////////////////////////////////////////////////////////////
+// Airplane Component
+///////////////////////////////////////////////////////////////////////////////
+
+import React, { FC, useState } from "react";
 import {
   Entity,
   PointGraphics,
@@ -7,7 +11,7 @@ import {
   // BoxGraphics,
   // EllipseGraphics,
 } from "resium";
-import { Cartesian3, Color } from "cesium";
+import Cesium, { Cartesian3, Color } from "cesium";
 
 // Common Airplane Data Type.
 export type AirplaneProps = {
@@ -18,8 +22,9 @@ export type AirplaneProps = {
   Icao: string; // "C03472"
   Mdl: string; // "Boeing 737NG 7CT/W"
   Op: string; // "WestJet"
-  OpIcao: string; // "WJA"
+  // OpIcao: string; // "WJA"
   To: string; // "CYYJ Victoria, Canada"
+  PosTime: number; // Time (UTC) that the position was last reported by the aircraft.
   MyCnt: number; // Our internal use (for MAP interpolationO).
 };
 
@@ -50,7 +55,17 @@ function randomColor(dat: any): Color {
   return randomColor(h);
 }
 
+// const cbp = new Cesium.CallbackProperty((time) => {
+//   return "Hohoho";
+// }, false);
+
 export const Airplane: FC<AirplaneArgs> = ({ dat, color }) => {
+  //const [cp, setCp] = useState<any>(null);
+
+  // if (cp == null) {
+  //   setCp(cbp);
+  // }
+
   const lat = dat.Cos[0];
   const lng = dat.Cos[1];
   const high = dat.Cos[3];

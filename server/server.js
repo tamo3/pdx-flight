@@ -6,11 +6,16 @@ const fs = require('fs');
 //const fetch = require('node-fetch');
 const app = express();
 const port = process.env.PORT || 5000;  // Use given port when deployed, or localhost:5000.
-var router = express.Router();
+// var router = express.Router();
 const axios = require("axios");
 const toFixed = require('tofixed');
 
 console.log('PUBLIC_URL is: ', process.env.PUBLIC_URL);
+
+
+const KEY_AVIATIONSTACK = process.env.API_KEY_AVIATIONSTACK;
+//console.log('KEY is : ' + KEY_AVIATIONSTACK);
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Static File Serving 
@@ -29,13 +34,13 @@ if (process.env.NODE_ENV === 'production') {
   //   > heroku logs --tail --app pdx-flight
   //   ... shows the log and it keeps displaying new log messages ...
   // 
-  console.log(`QQQ using ${__dirname} ../build`);
+  console.log(`Using ${__dirname}../build`);
   app.use(express.static(path.join(__dirname, '../build'))); // build directory is ./server/../build
 }
 else {
   // TT: this is not really used. During the debugging, React uses its own server running and doesn't use
   // express server.
-  console.log(`QQQ using ${__dirname} ../public`);
+  console.log(`Using ${__dirname}../public`);
   app.use(express.static(path.join(__dirname, '../public'))); // publicdirectory is ./server/../public
 }
 app.use(express.json());
@@ -79,7 +84,6 @@ function InRange(shortTrailsCos, circle) {
 
 app.get('/api/history', (req, res) => {
   // URL example: "/api/history?file=2016-07-01-0000Z.json&lng=-122.595172&lat=45.5895&range=1000000
-
   // 45.423813, -122.727625  // oregon lat, lng
   // 37.799269, -122.463953  // sf  lat, lng   ~800km
   // const dis = distance(45.423813, -122.727625, 37.799269, -122.463953);
@@ -101,7 +105,7 @@ app.get('/api/history', (req, res) => {
     return (x.TT === 'a' && x.Cos && x.Cos.length >= 4 && InRange(x.Cos, circle));
   })
   // console.log(inRange);
-  console.log(`${file} lat:${toFixed(circle[0], 2)} lng:${toFixed(circle[1], 2)} r:${toFixed(circle[2] / 1000, 0)}km ${inRange.length}airplanes`);
+  console.log(`${file} lat:${toFixed(circle[0], 2)} lng:${toFixed(circle[1], 2)} r:${toFixed(circle[2] / 1000, 0)}km ${inRange.length} airplanes`);
 
   res.setHeader('Access-Control-Allow-Origin', '*'); // CORS -- this was necessary.
   res.setHeader('Access-Control-Allow-Methods', 'GET');
@@ -113,7 +117,9 @@ app.get('/api/history', (req, res) => {
 // Realtime Airplane Position Data using OpenSky
 ///////////////////////////////////////////////////////////////////////////////
 
+
 app.get('/api/opensky', (req, res) => {
+  // URL example: "/api/opensky?lng=-122.595172&lat=45.5895&range=1000000"
   const range = req.query.range;
   const d = distToDegree(range);
   const lat = Number(req.query.lat);
@@ -137,6 +143,48 @@ app.get('/api/opensky', (req, res) => {
     .catch((error) => {
       console.log(error)
     })
+})
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Realtime Airplane Position Data using AviationStack
+// - Used to get destination and origin from call-sign.
+///////////////////////////////////////////////////////////////////////////////
+
+// Our volatile database -- just cache already looked up data.
+let flightDb = new Map();
+
+app.get('/api/aviationstack', (req, res) => {
+  // URL example: "/api/aviationstack?call=UAL2147"
+  const callSign = req.query.call.trip();
+  // Not quite sure the difference between call sign and CIAO, but the call sign returned by OpenSky can be
+  // used as 'ciao' in AviationStack.
+
+  const dat = flightDb.get(callSign);
+  if (dat) {
+    res.send(dat); // Data already in DB, so just send it (JSON).
+  }
+  else {
+    const params = {
+      access_key: KEY_AVIATIONSTACK,
+      flight_icao: callSign,
+    }
+    axios.get('http://api.aviationstack.com/v1/flights', { params })
+      .then(response => {
+        return response.data;
+      })
+      .then((data) => {
+        console.log(data)
+        // res.setHeader('Access-Control-Allow-Origin', '*'); // CORS -- this was necessary.
+        // res.setHeader('Access-Control-Allow-Methods', 'GET');
+        res.send(data); // Send JSON response.
+        flightDb.set(callSign, data); // Add to our database.
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
 })
 
 

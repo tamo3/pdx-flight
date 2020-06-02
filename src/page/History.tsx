@@ -1,8 +1,10 @@
+///////////////////////////////////////////////////////////////////////////////
 // Plot airplanes based on historical data.
 //
 // - It is assumed the data is from  https://history.adsbexchange.com/downloads/samples/  2016-07-01.zip
 //   2016-07-01.zip has all the data for the day, the format seems to be the same as:
 //   https://www.virtualradarserver.co.uk/Documentation/Formats/AircraftList.aspx
+///////////////////////////////////////////////////////////////////////////////
 
 import React, { useEffect, useState, useRef } from "react";
 // import ReactDOM from 'react-dom';
@@ -23,6 +25,7 @@ import {
   // EllipseGraphics,
 } from "resium";
 import Cesium, {
+  Ion,
   Camera as CCamera,
   Cartesian2,
   Cartesian3,
@@ -38,6 +41,10 @@ import Cesium, {
 import Airplane, { AirplaneProps } from "./Airplane";
 import { Pos2D, OriginalPos, CameraHome, GetCenterPosition } from "./cesium-util";
 import "./Map.css";
+
+Ion.defaultAccessToken = process.env.REACT_APP_CESIUM ?? "";
+const key = process.env.REACT_APP_CESIUM;
+console.log(key);
 
 export const historyOfDate = "2016-07-01"; // This must match with the data file names served by node server (i.e 2016-07-01-nnnnZ.json, etc)
 
@@ -71,13 +78,16 @@ function HistoryPage() {
         Icao: x.Icao, // "C03472"
         Mdl: x.Mdl, // "Boeing 737NG 7CT/W"
         Op: x.Op, // "WestJet"
-        OpIcao: x.OpIcao, // "WJA"
         To: x.To, // "CYYJ Victoria, Canada"
+        PosTime: x.PosTime,
         MyCnt: 0, // Not used by History page.
       };
       return dst;
     });
-    return props;
+    // Remove duplicated Call-sign entries: https://medium.com/dailyjs/how-to-remove-array-duplicates-in-es6-5daa8789641c
+    const callArray = props.map((x) => x.Call);
+    const uniqueProps = props.filter((x, index) => callArray.indexOf(x.Call) === index);
+    return uniqueProps;
   }
 
   // Called ~60 times / second. Updates currentTime, which triggers redraw.
@@ -154,6 +164,7 @@ function HistoryPage() {
   }, []); // ESlint complains about this (add onTick, etc), but if you do so, then things don't work well.
   // I think it is OK because this is a one time initialization.
 
+  //    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI3NzJmYTc2Zi02MjgyLTQ3MGItODE5NS1mMTYyZDgyYjI4ZmYiLCJpZCI6MjY0NzIsInNjb3BlcyI6WyJhc3IiLCJnYyJdLCJpYXQiOjE1ODc3OTc2OTR9.YsN5xZgmf0728XTho6jJTVTEUcf-FJgKXVWW0iJ3gVs";
   return (
     <div className='cesiumContainer'>
       <Viewer ref={refC}>
@@ -165,7 +176,7 @@ function HistoryPage() {
         <Entity>
           <div>
             {airplaneData.map((x: any, index: number) => {
-              return <Airplane key={x.Call + index.toString()} dat={x} />;
+              return <Airplane key={x.Call ?? index.toString()} dat={x} />;
             })}
           </div>
         </Entity>
