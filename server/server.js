@@ -28,7 +28,6 @@ if (process.env.NODE_ENV === 'production') {
   // To see files on Heroku, you can do this:
   //   > heroku login                                    (opens browser)
   //   > heroku run bash --app My-App-Name-In-Heroku     (i.e. pdx-flight)
-  //   $ cd app
   //   $ ls
   // To see log (console log) for this server.js:
   //   > heroku logs --tail --app pdx-flight
@@ -56,6 +55,10 @@ app.listen(port, () => console.log(`Listening on port ${port}`));
 app.get('/api/debug', (req, res) => {
   console.log('server app.get /express_backend called');
   res.send({ "express": "Hello from Express!" });
+  let k = process.env.API_KEY_AVIATIONSTACK;
+  console.log(k);
+  k = process.env.REACT_APP_CESIUM;
+  console.log(k);
 });
 
 
