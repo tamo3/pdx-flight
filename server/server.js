@@ -14,7 +14,7 @@ console.log('PUBLIC_URL is: ', process.env.PUBLIC_URL);
 
 
 const KEY_AVIATIONSTACK = process.env.API_KEY_AVIATIONSTACK;
-console.log('KEY is : ' + KEY_AVIATIONSTACK);
+// console.log('KEY is : ' + KEY_AVIATIONSTACK);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -59,6 +59,12 @@ app.get('/api/debug', (req, res) => {
   console.log(k);
   k = process.env.REACT_APP_CESIUM;
   console.log(k);
+});
+
+app.get('/api/weoriu', (req, res) => {
+  console.log('server app.get /express_backend called');
+  const k = process.env.REACT_APP_CESIUM;
+  res.send({ "weoriu": k });
 });
 
 
