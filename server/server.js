@@ -55,16 +55,17 @@ app.listen(port, () => console.log(`Listening on port ${port}`));
 app.get('/api/debug', (req, res) => {
   console.log('server app.get /express_backend called');
   res.send({ "express": "Hello from Express!" });
-  let k = process.env.API_KEY_AVIATIONSTACK;
-  console.log(k);
-  k = process.env.REACT_APP_CESIUM;
-  console.log(k);
+  // let k = process.env.API_KEY_AVIATIONSTACK;
+  // console.log("a" + k);
+  // k = process.env.REACT_APP_CESIUM;
+  // console.log(k);
 });
 
 app.get('/api/weoriu', (req, res) => {
-  console.log('server app.get /express_backend called');
+  console.log(' server app.get /express_backend called');
   const k = process.env.REACT_APP_CESIUM;
   res.send({ "weoriu": k });
+  // console.log(k);
 });
 
 
@@ -150,7 +151,7 @@ app.get('/api/opensky', (req, res) => {
       res.send(data); // Send JSON response.
     })
     .catch((error) => {
-      console.log(error)
+      console.log(error + ` url:${url}`)
     })
 })
 

@@ -42,11 +42,24 @@ import Airplane, { AirplaneProps } from "./Airplane";
 import { Pos2D, OriginalPos, CameraHome, GetCenterPosition } from "./cesium-util";
 import "./Map.css";
 
-Ion.defaultAccessToken = process.env.REACT_APP_CESIUM ?? "";
-const key = process.env.REACT_APP_CESIUM;
-console.log(key);
-
 export const historyOfDate = "2016-07-01"; // This must match with the data file names served by node server (i.e 2016-07-01-nnnnZ.json, etc)
+
+// Fetch from server.
+function tmpFetch() {
+  fetch("/api/weoriu")
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      // console.log(data);
+      const dat = data.weoriu;
+      Ion.defaultAccessToken = dat as string;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+tmpFetch();
 
 const cameraDest = Cartesian3.fromDegrees(OriginalPos.lng, OriginalPos.lat, 250000);
 // const position = Cartesian3.fromDegrees(origPos.lng, origPos.lat, 100);

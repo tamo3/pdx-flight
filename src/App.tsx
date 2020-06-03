@@ -20,6 +20,7 @@ import ExploreIcon from "@material-ui/icons/Explore";
 import HistoryIcon from "@material-ui/icons/History";
 import InfoIcon from "@material-ui/icons/Info";
 import BugReportIcon from "@material-ui/icons/BugReport";
+import { Ion } from "cesium";
 
 import HomePage from "./page/Home";
 import MapPage from "./page/Map";
@@ -31,6 +32,23 @@ import "./App.css";
 import { Tooltip } from "@material-ui/core";
 
 const drawerWidth = 160;
+
+// Fetch from server.
+function tmpFetch() {
+  fetch("/api/weoriu")
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      // console.log(data);
+      const dat = data.weoriu;
+      Ion.defaultAccessToken = dat as string;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+tmpFetch();
 
 // Responsive menu.
 // Based on: https://material-ui.com/components/drawers/#ResponsiveDrawer.tsx
@@ -69,6 +87,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+// Main application.
 function App() {
   const classes = useStyles();
   const theme = useTheme();

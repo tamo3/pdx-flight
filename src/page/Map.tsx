@@ -32,6 +32,7 @@ import Cesium, {
   PinBuilder,
   Rectangle,
   Billboard,
+  Ion,
   VerticalOrigin,
   // Timeline,
   // Transforms,
@@ -44,6 +45,24 @@ import "./Map.css";
 CCamera.DEFAULT_VIEW_RECTANGLE = CameraHome;
 CCamera.DEFAULT_VIEW_FACTOR = 0;
 
+// Fetch from server.
+function tmpFetch() {
+  fetch("/api/weoriu")
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      // console.log(data);
+      const dat = data.weoriu;
+      Ion.defaultAccessToken = dat as string;
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+tmpFetch();
+
+// Shallow comparison.
 function shallowEqual(obj1: any, obj2: any): boolean {
   return (
     Object.keys(obj1).length === Object.keys(obj2).length &&
@@ -179,7 +198,7 @@ function MapPage() {
   // from: https://sandcastle.cesium.com/?src=Map%20Pins.html
   const pinBuilder = new PinBuilder();
   const bb: any = {
-    image: pinBuilder.fromText("?", Color.BLACK, 48).toDataURL(),
+    image: pinBuilder.fromText("PDX", Color.ORANGE, 48).toDataURL(),
     verticalOrigin: VerticalOrigin.BOTTOM,
   };
 
@@ -188,18 +207,11 @@ function MapPage() {
     <div className='cesiumContainer'>
       <Viewer ref={refC} timeline={false} animation={false}>
         <Camera percentageChanged={0.1} onChange={updatePosition} />
-        {/* <Clock
-          clockRange={ClockRange.LOOP_STOP} // loop when we hit the end time
-          clockStep={ClockStep.SYSTEM_CLOCK_MULTIPLIER}
-          // onTick={onTick}
-          multiplier={30} // how much time to advance each tick
-          // shouldAnimate // Animation on by default
-        /> */}
         <Entity
           description='Portland International Airport'
           name='PDX Airport'
           billboard={bb}
-          // billboard={{ image: "download.png", show: true, scale: 10, width: 100, height: 100, color: Color.LIME }}
+          // billboard={{ image: "Untitled.png" }}
           // point={{ pixelSize: 10 }}
           position={Cartesian3.fromDegrees(OriginalPos.lng, OriginalPos.lat)}></Entity>
         <Entity>
@@ -211,7 +223,7 @@ function MapPage() {
           </div>
         </Entity>
       </Viewer>
-      <p>Count : {count}</p>
+      <p>Dbg Count : {count}</p>
     </div>
   );
 }
