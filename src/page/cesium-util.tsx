@@ -2,35 +2,7 @@
 // Utility Functions, Common types, etc.
 ///////////////////////////////////////////////////////////////////////////////
 
-// import React, { useEffect, useState, useRef } from "react";
-// import ReactDOM from 'react-dom';
-// import {
-//   Viewer,
-//   Entity /*PointGraphics*/,
-//   Camera,
-//   CameraFlyTo,
-//   Globe,
-//   CesiumComponentRef,
-//   // Model,
-//   // ModelGraphics,
-//   // Billboard,
-//   // PointGraphics,
-//   // BoxGraphics,
-//   // EllipseGraphics,
-// } from "resium";
-import Cesium, {
-  Camera as CCamera,
-  Cartesian2,
-  Cartesian3,
-  // ClockViewModel,
-  // JulianDate,
-  // ClockRange,
-  // ClockStep,
-  Rectangle,
-  // Timeline,
-  // Transforms,
-  // Color,
-} from "cesium";
+import { Cartesian2, Rectangle } from "cesium";
 
 export type Pos2D = {
   lat: number;

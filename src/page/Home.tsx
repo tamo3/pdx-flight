@@ -102,7 +102,11 @@ function HomePage() {
   return (
     <div className='HomePage'>
       <h2>Home</h2>
-      <button onClick={buttonClick5}>Click Me</button>
+      <button onClick={buttonClick}>Click Me</button>
+      <button onClick={buttonClick2}>Click Me2</button>
+      <button onClick={buttonClick3}>Click Me3</button>
+      <button onClick={buttonClick4}>Click Me4</button>
+      <button onClick={buttonClick5}>Click Me5</button>
     </div>
   );
 }

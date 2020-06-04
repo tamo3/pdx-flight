@@ -2,42 +2,10 @@
 // Display Realtime Airplane Positions
 ///////////////////////////////////////////////////////////////////////////////
 
-import React, { FC, useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 // import ReactDOM from 'react-dom';
-import {
-  Viewer,
-  Entity /*PointGraphics*/,
-  Camera,
-  // CameraFlyTo,
-  Clock,
-  // Scene,
-  // Globe,
-  CesiumComponentRef,
-  // Model,
-  // ModelGraphics,
-  // Billboard,
-  // PointGraphics,
-  // BoxGraphics,
-  // EllipseGraphics,
-} from "resium";
-import Cesium, {
-  Camera as CCamera,
-  // Cartesian2,
-  Cartesian3,
-  Color,
-  // ClockViewModel,
-  JulianDate,
-  ClockRange,
-  ClockStep,
-  PinBuilder,
-  Rectangle,
-  Billboard,
-  Ion,
-  VerticalOrigin,
-  // Timeline,
-  // Transforms,
-  // Color,
-} from "cesium";
+import { Viewer, Entity /*PointGraphics*/, Camera, CesiumComponentRef } from "resium";
+import Cesium, { Camera as CCamera, Cartesian3, Color, PinBuilder, VerticalOrigin } from "cesium";
 import Airplane, { AirplaneProps } from "./Airplane";
 import { Pos2D, OriginalPos, CameraHome, GetCenterPosition } from "./cesium-util";
 import "./Map.css";
@@ -123,7 +91,7 @@ function interpolatePosition(x: AirplaneProps, prevData: AirplaneProps[], count:
 function MapPage() {
   // React Hooks:
   const [airplaneData, setAirplaneData] = useState<AirplaneProps[]>([]); // Array of airplane data from the Server.
-  const [airplaneData0, setAirplaneData0] = useState<AirplaneProps[]>([]); // Previous data.
+  const [airplaneData0, setAirplaneData0] = useState<AirplaneProps[]>([]); // Previous data, used as a storage for prefData.
   const prevData = useRef(airplaneData0); // Points to the previous airPlaneData, used for interpolation.
   const [needFetch, setNeedFetch] = useState(false);
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter, Route, Switch, Link, Redirect } from "react-router-dom";
+import { BrowserRouter, Route, Switch, Link, Redirect, useLocation } from "react-router-dom";
 import { makeStyles, useTheme, Theme, createStyles } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
 import Hidden from "@material-ui/core/Hidden";
@@ -30,10 +30,10 @@ import DebugPage from "./page/Debug";
 
 import "./App.css";
 
-// todo: Ion.defaultAccessToken = {your-key-here};
+//Ion.defaultAccessToken = "your-Cesium-key-here"; // <== TODO: Put your Cesium Key here!
 const drawerWidth = 160;
 
-// Responsive menu.
+// Responsive menu for small screen.
 // Based on: https://material-ui.com/components/drawers/#ResponsiveDrawer.tsx
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -114,14 +114,10 @@ function MainBody() {
   }
 }
 
-// Main application.
-function App() {
+// Navigation Menu Items.
+function DrawerContents() {
   const classes = useStyles();
-  const theme = useTheme();
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
+  const location = useLocation();
   const icons = [<HomeIcon />, <ExploreIcon />, <HistoryIcon />, <InfoIcon />, <BugReportIcon />];
   const toolTips = [
     `Home page`,
@@ -130,9 +126,7 @@ function App() {
     `About this website`,
     `For Debug`,
   ];
-
-  // Navigation bar contents on the left.
-  const drawer = (
+  return (
     <div>
       <div className={classes.toolbar} />
       <List>
@@ -142,7 +136,7 @@ function App() {
             <Link to={s} key={text}>
               {index === 0 ? <Divider /> : undefined}
               <Tooltip title={toolTips[index]}>
-                <ListItem button key={text}>
+                <ListItem button key={text} selected={location.pathname === "/" + text}>
                   <ListItemIcon>{icons[index]}</ListItemIcon>
                   <ListItemText primary={text} />
                 </ListItem>
@@ -154,6 +148,16 @@ function App() {
       </List>
     </div>
   );
+}
+
+// Main application.
+function App() {
+  const classes = useStyles();
+  const theme = useTheme();
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
 
   const container = window !== undefined ? () => document.body : undefined;
 
@@ -177,7 +181,6 @@ function App() {
           </Toolbar>
         </AppBar>
         <nav className={classes.drawer} aria-label='navigation buttons'>
-          {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
           <Hidden smUp implementation='css'>
             <Drawer
               container={container}
@@ -191,7 +194,7 @@ function App() {
               ModalProps={{
                 keepMounted: true, // Better open performance on mobile.
               }}>
-              {drawer}
+              <DrawerContents />
             </Drawer>
           </Hidden>
           <Hidden xsDown implementation='css'>
@@ -201,7 +204,7 @@ function App() {
               }}
               variant='permanent'
               open>
-              {drawer}
+              <DrawerContents />
             </Drawer>
           </Hidden>
         </nav>
@@ -211,23 +214,6 @@ function App() {
           <div className={classes.toolbar} />
           <div className='cesiumContainer'>
             <MainBody />
-            {/* 
-            {
-              <Switch>
-                <Route
-                  exact
-                  path='/'
-                  render={() => {
-                    return <Redirect to='/Home' />;
-                  }}
-                />
-                <Route path='/Home' component={HomePage} />
-                <Route path='/Map' component={MapPage} />
-                <Route path='/History' component={HistoryPage} />
-                <Route path='/About' component={AboutPage} />
-                <Route path='/Debug' component={DebugPage} />
-              </Switch>
-            } */}
           </div>
         </main>
       </BrowserRouter>

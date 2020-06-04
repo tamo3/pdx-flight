@@ -35,26 +35,10 @@ function getAirport() {
     });
 }
 
-function getAir1() {
-  const url = "https://opensky-network.org/api/states/all?lamin=45.8389&lomin=5.9962&lamax=47.8229&lomax=10.5226";
-  //   fetch(url)
-  //     .then((response) => {
-  //       console.log(response);
-  //       return response.json;
-  //     })
-  //     .then((data) => {
-  //       console.log(data);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-}
-
 const urlAirlane = "/api/opensky?lng=-122.595172&lat=45.5895&range=1000000";
 function getAirplane() {
   fetch(urlAirlane)
     .then((response) => {
-      const res: any = response;
       // console.log(`res 0 ${res.states[0]}`);
       // console.log(response);
       return response.json();
