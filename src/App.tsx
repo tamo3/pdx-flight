@@ -15,18 +15,19 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import MenuIcon from "@material-ui/icons/Menu";
 import HomeIcon from "@material-ui/icons/Home";
-import ExploreIcon from "@material-ui/icons/Explore";
 import HistoryIcon from "@material-ui/icons/History";
 import InfoIcon from "@material-ui/icons/Info";
-import BugReportIcon from "@material-ui/icons/BugReport";
 import { Tooltip } from "@material-ui/core";
 import { Ion } from "cesium";
 
-import HomePage from "./page/Home";
 import MapPage from "./page/Map";
 import HistoryPage, { historyOfDate } from "./page/History";
 import AboutPage from "./page/About";
-import DebugPage from "./page/Debug";
+
+// import ExploreIcon from "@material-ui/icons/Explore";
+// import BugReportIcon from "@material-ui/icons/BugReport";
+// import HomePage from "./page/Home";
+// import DebugPage from "./page/Debug";
 
 import "./App.css";
 
@@ -104,11 +105,11 @@ function MainBody() {
             return <Redirect to='/Home' />;
           }}
         />
-        <Route path='/Home' component={HomePage} />
-        <Route path='/Map' component={MapPage} />
+        {/* <Route path='/Home' component={HomePage} /> */}
+        <Route path='/Home' component={MapPage} />
         <Route path='/History' component={HistoryPage} />
         <Route path='/About' component={AboutPage} />
-        <Route path='/Debug' component={DebugPage} />
+        {/* <Route path='/Debug' component={DebugPage} /> */}
       </Switch>
     );
   }
@@ -118,19 +119,19 @@ function MainBody() {
 function DrawerContents() {
   const classes = useStyles();
   const location = useLocation();
-  const icons = [<HomeIcon />, <ExploreIcon />, <HistoryIcon />, <InfoIcon />, <BugReportIcon />];
+  const icons = [<HomeIcon />, /*<ExploreIcon />,*/ <HistoryIcon />, <InfoIcon /> /*<BugReportIcon />*/];
   const toolTips = [
     `Home page`,
-    `Map page`,
+    // `Map page`,
     `Historical airplane positions for ${historyOfDate}`,
     `About this website`,
-    `For Debug`,
+    // `For Debug`,
   ];
   return (
     <div>
       <div className={classes.toolbar} />
       <List>
-        {["Home", "Map", "History", "About", "Debug"].map((text, index) => {
+        {["Home", /*"Map",*/ "History", "About" /*"Debug"*/].map((text, index) => {
           const s = `/${text}`;
           return (
             <Link to={s} key={text}>
