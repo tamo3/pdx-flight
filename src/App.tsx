@@ -121,7 +121,7 @@ function DrawerContents() {
   const location = useLocation();
   const icons = [<HomeIcon />, /*<ExploreIcon />,*/ <HistoryIcon />, <InfoIcon /> /*<BugReportIcon />*/];
   const toolTips = [
-    `Home page`,
+    `Realtime Flight Tracking`,
     // `Map page`,
     `Historical airplane positions for ${historyOfDate}`,
     `About this website`,

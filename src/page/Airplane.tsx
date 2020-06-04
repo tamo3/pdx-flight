@@ -28,25 +28,26 @@ type AirplaneArgs = {
 };
 
 // Generate random value base on the input integer. Returns the same random value for the same input number.
-function xorshift32(v: number) {
-  const UINT32_MAX_NEXT = 2 ** 32;
-  v = v ^ (v << 13);
-  v = v ^ (v >> 17);
-  v = v ^ (v << 15);
-  return v / UINT32_MAX_NEXT;
+function xorshift16(v: number) {
+  const UINT32_MAX_NEXT = 2 ** 16;
+  v = v ^ (v << 7);
+  v = v ^ (v >> 9);
+  v = v ^ (v << 8);
+  return (v % UINT32_MAX_NEXT) / UINT32_MAX_NEXT;
 }
 
 // Generate random color based on the 'Call' -- will have the same color for the same Call number.
 function randomColor(dat: any): Color {
   function randomColor(id: number): Color {
-    const r = xorshift32(id * 3 + 23) / 2 + 0.499; // Makes the dot slightly brighter, reddish so that it standout from background.
-    const g = xorshift32(id * 7 + 13);
-    const b = xorshift32(id) * 13 * 17;
+    const r = xorshift16(id * 11 + 23); // Make the dot slightly brighter, reddish so that it standout from background.
+    const g = xorshift16(id * 7 + 13); // Make the dot slightly less green.
+    const b = xorshift16(id * 13 + 17); // Make the dot slightly less blue.
+    // console.log(`${id} => (${r} ${g} ${b})`);
     return new Color(r, g, b); // Color R,G,B = [0..1].
   }
   const hashCode = (s: string) => s.split("").reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) | 0, 0);
   const h = hashCode(dat.Call || dat.Icao || "unknown");
-  return randomColor(h);
+  return randomColor(Math.abs(h));
 }
 
 export const Airplane: FC<AirplaneArgs> = ({ dat, color }) => {
@@ -59,7 +60,7 @@ export const Airplane: FC<AirplaneArgs> = ({ dat, color }) => {
   const colr = color || randomColor(dat);
   const dot: any =
     dat.Call && dat.To ? (
-      <PointGraphics color={colr} pixelSize={12} />
+      <PointGraphics color={colr} pixelSize={14} outlineColor={Color.YELLOW} outlineWidth={2} />
     ) : (
       // Without call sign and destination, this is probably a small non passenger airplane, make it look a bit dim.
       <PointGraphics color={colr} pixelSize={6} outlineColor={Color.GRAY} outlineWidth={4} />
