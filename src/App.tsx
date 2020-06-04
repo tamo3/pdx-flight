@@ -157,6 +157,13 @@ function DrawerContents() {
   );
 }
 
+function Title() {
+  const location = useLocation();
+  if (location.pathname === "/History") return <div>{`PDX-Flight : Historical Flight Data (${historyOfDate})`}</div>;
+  if (location.pathname === "/Home") return <div>{`PDX-Flight : Realtime Tracking`}</div>;
+  return <div>PDX-Flight</div>;
+}
+
 // Main application.
 function App() {
   const classes = useStyles();
@@ -165,7 +172,6 @@ function App() {
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
-
   const container = window !== undefined ? () => document.body : undefined;
 
   return (
@@ -183,7 +189,8 @@ function App() {
               <MenuIcon />
             </IconButton>
             <Typography variant='h6' noWrap>
-              PDX-Flight
+              <Title />
+              {/* PDX-Flight */}
             </Typography>
           </Toolbar>
         </AppBar>

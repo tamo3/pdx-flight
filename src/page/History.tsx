@@ -20,6 +20,16 @@ const cameraDest = Cartesian3.fromDegrees(OriginalPos.lng, OriginalPos.lat, 2500
 CCamera.DEFAULT_VIEW_RECTANGLE = CameraHome;
 CCamera.DEFAULT_VIEW_FACTOR = 0;
 
+function HistoryLegend() {
+  return (
+    <div>
+      <ul>
+        <li></li>
+      </ul>
+    </div>
+  );
+}
+
 // History Page component.
 function HistoryPage() {
   // Server Access URL template: Files are from  https://history.adsbexchange.com/downloads/samples/
@@ -148,10 +158,7 @@ function HistoryPage() {
         </Entity>
         <Globe enableLighting />
         <div className='toolbar-left'>
-          {" "}
-          {/* Display at Upper-Left corner */}
-          {/* <button>Click me!</button>
-          <h1>HOhoho</h1> */}
+          <HistoryLegend />
         </div>
       </Viewer>
     </div>

@@ -14,7 +14,6 @@ console.log('PUBLIC_URL is: ', process.env.PUBLIC_URL);
 
 
 const KEY_AVIATIONSTACK = process.env.API_KEY_AVIATIONSTACK;
-// console.log('KEY is : ' + KEY_AVIATIONSTACK);
 
 
 ///////////////////////////////////////////////////////////////////////////////
