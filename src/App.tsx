@@ -190,7 +190,6 @@ function App() {
             </IconButton>
             <Typography variant='h6' noWrap>
               <Title />
-              {/* PDX-Flight */}
             </Typography>
           </Toolbar>
         </AppBar>

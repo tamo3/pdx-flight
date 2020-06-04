@@ -17,13 +17,6 @@ html {
   width: calc(100% - 208px); /* 160 (left menu/drawer) - 24 x 2 (left, right padding) */
   height: calc(100% - 110px);
 }
-@media only screen and (max-width: 599px) {
-  .cesiumContainer {
-    position: absolute;
-    width: calc(100% - 48px); /* 160 (left menu/drawer) - 24 x 2 (left, right padding) */
-    height: calc(100% - 110px);
-  }
-}
 
 .cesiumContainer > div {
   height: 100%;
@@ -32,10 +25,28 @@ html {
 .toolbar-left {
   /* display: block; */
   position: absolute;
-  top: 5px;
-  left: 5px;
-  height: 100px;
+  top: 10px;
+  left: 10px;
+  /* height: 100px; */
+  padding: 7px;
+  border-radius: 7px;
 }
+
+.history-legend {
+  background-color: rgba(222, 132, 245, 0.9);
+}
+
+@media only screen and (max-width: 599px) {
+  .cesiumContainer {
+    position: absolute;
+    width: calc(100% - 48px); /* 160 (left menu/drawer) - 24 x 2 (left, right padding) */
+    height: calc(100% - 110px);
+  }
+  .history-legend {
+    display: none;
+  }
+}
+
 h1 {
   color: black;
 }

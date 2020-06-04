@@ -149,7 +149,7 @@ function MapPage() {
   // from: https://sandcastle.cesium.com/?src=Map%20Pins.html
   const pinBuilder = new PinBuilder();
   const bb: any = {
-    image: pinBuilder.fromText("PDX", Color.ORANGE, 48).toDataURL(),
+    image: pinBuilder.fromText("PDX", Color.BLACK, 48).toDataURL(),
     verticalOrigin: VerticalOrigin.BOTTOM,
   };
 

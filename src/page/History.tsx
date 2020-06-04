@@ -8,24 +8,39 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { Viewer, Entity /*PointGraphics*/, Camera, CameraFlyTo, Globe, CesiumComponentRef } from "resium";
-import Cesium, { Camera as CCamera, Cartesian3, JulianDate, ClockRange, ClockStep } from "cesium";
+import Cesium, {
+  Camera as CCamera,
+  Cartesian3,
+  JulianDate,
+  ClockRange,
+  ClockStep,
+  PinBuilder,
+  Color,
+  VerticalOrigin,
+} from "cesium";
 import Airplane, { AirplaneProps } from "./Airplane";
 import { Pos2D, OriginalPos, CameraHome, GetCenterPosition } from "./cesium-util";
+import yellowDot from "./yellow.png";
+import grayDot from "./gray.png";
 import "./Map.css";
 
-export const historyOfDate = "2016-07-01"; // This must match with the data file names served by node server (i.e 2016-07-01-nnnnZ.json, etc)
+// This must match with the data file names served by node server (i.e 2016-07-01-nnnnZ.json, etc)
+export const historyOfDate = "2016-07-01";
 
 const cameraDest = Cartesian3.fromDegrees(OriginalPos.lng, OriginalPos.lat, 250000);
-// const position = Cartesian3.fromDegrees(origPos.lng, origPos.lat, 100);
 CCamera.DEFAULT_VIEW_RECTANGLE = CameraHome;
 CCamera.DEFAULT_VIEW_FACTOR = 0;
 
+// Legends at upper-left corner.
 function HistoryLegend() {
+  const size = { height: 20, width: 20 };
   return (
     <div>
-      <ul>
-        <li></li>
-      </ul>
+      <img className='my-image' src={yellowDot} alt={"Dot with yellow circle"} style={size} />
+      <b> Airplane with call-sign</b>
+      <br />
+      <img className='my-image' src={grayDot} alt={"Dot with gray circle"} style={size} />{" "}
+      <b>Airplane without call-sign</b>
     </div>
   );
 }
@@ -141,9 +156,21 @@ function HistoryPage() {
   }, []); // ESlint complains about this (add onTick, etc), but if you do so, then things don't work well.
   // I think it is OK because this is a one time initialization.
 
+  const pinBuilder = new PinBuilder();
+  const bb: any = {
+    image: pinBuilder.fromText("PDX", Color.BLACK, 48).toDataURL(),
+    verticalOrigin: VerticalOrigin.BOTTOM,
+  };
+
+  // Render
   return (
     <div className='cesiumContainer'>
       <Viewer ref={refC}>
+        <Entity
+          description='Portland International Airport'
+          name='PDX Airport'
+          billboard={bb}
+          position={Cartesian3.fromDegrees(OriginalPos.lng, OriginalPos.lat)}></Entity>
         <Camera percentageChanged={0.1} onChange={updatePosition} />
         {/* once = Move camera only once */}
         <CameraFlyTo destination={cameraDest} duration={0} once={true} />
@@ -157,7 +184,7 @@ function HistoryPage() {
           </div>
         </Entity>
         <Globe enableLighting />
-        <div className='toolbar-left'>
+        <div className='toolbar-left history-legend'>
           <HistoryLegend />
         </div>
       </Viewer>

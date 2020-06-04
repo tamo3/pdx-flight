@@ -12,7 +12,9 @@ import PersonIcon from "@material-ui/icons/Person";
 import AddIcon from "@material-ui/icons/Add";
 import Typography from "@material-ui/core/Typography";
 import { blue } from "@material-ui/core/colors";
-import { withStyles } from "@material-ui/core/styles";
+// import { withStyles } from "@material-ui/core/styles";
+import yellowDot from "./yellow.png";
+import grayDot from "./gray.png";
 
 const emails = ["username@gmail.com", "user02@gmail.com"];
 const useStyles = makeStyles({
@@ -92,6 +94,17 @@ export function SimpleDialogDemo() {
   );
 }
 
+function HistoryLegend() {
+  return (
+    <div>
+      <img className='my-image' src={yellowDot} alt={"Dot with yellow circle"} />
+      <span> Airplane with call-sign</span>
+      <br />
+      <img className='my-image' src={grayDot} alt={"Dot with gray circle"} /> Airplane without call-sign
+    </div>
+  );
+}
+
 export default function DebugPage() {
   // const StyledDialog = withStyles({ root: { pointerEvents: "none" }, paper: { pointerEvents: "auto" } })((props) => (
   //   <Dialog hideBackdrop {...props} />
@@ -100,6 +113,7 @@ export default function DebugPage() {
     <div>
       <h1>Debug Page</h1>
       <SimpleDialogDemo />
+      <HistoryLegend />
     </div>
   );
 }
