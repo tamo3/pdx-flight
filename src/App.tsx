@@ -25,9 +25,9 @@ import HistoryPage, { historyOfDate } from "./page/History";
 import AboutPage from "./page/About";
 
 // import ExploreIcon from "@material-ui/icons/Explore";
-// import BugReportIcon from "@material-ui/icons/BugReport";
 // import HomePage from "./page/Home";
-// import DebugPage from "./page/Debug";
+import BugReportIcon from "@material-ui/icons/BugReport";
+import DebugPage from "./page/Debug";
 
 import "./App.css";
 
@@ -109,7 +109,7 @@ function MainBody() {
         <Route path='/Home' component={MapPage} />
         <Route path='/History' component={HistoryPage} />
         <Route path='/About' component={AboutPage} />
-        {/* <Route path='/Debug' component={DebugPage} /> */}
+        <Route path='/Debug' component={DebugPage} />
       </Switch>
     );
   }
@@ -119,19 +119,25 @@ function MainBody() {
 function DrawerContents() {
   const classes = useStyles();
   const location = useLocation();
-  const icons = [<HomeIcon />, /*<ExploreIcon />,*/ <HistoryIcon />, <InfoIcon /> /*<BugReportIcon />*/];
+  const icons = [<HomeIcon />, /*<ExploreIcon />,*/ <HistoryIcon />, <InfoIcon />, <BugReportIcon />];
   const toolTips = [
     `Realtime Flight Tracking`,
     // `Map page`,
     `Historical airplane positions for ${historyOfDate}`,
     `About this website`,
-    // `For Debug`,
+    `For Debug`,
   ];
+
+  const pages =
+    process.env.NODE_ENV === "production"
+      ? ["Home", /*"Map",*/ "History", "About"]
+      : ["Home", /*"Map",*/ "History", "About", "Debug"]; // Enable Debug page if in development mode.
+
   return (
     <div>
       <div className={classes.toolbar} />
       <List>
-        {["Home", /*"Map",*/ "History", "About" /*"Debug"*/].map((text, index) => {
+        {pages.map((text, index) => {
           const s = `/${text}`;
           return (
             <Link to={s} key={text}>
@@ -213,7 +219,7 @@ function App() {
         {/* Main Windows layout */}
         <main className={classes.content}>
           <div className={classes.toolbar} />
-          <div className='cesiumContainer'>
+          <div className='pageContainer'>
             <MainBody />
           </div>
         </main>

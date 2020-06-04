@@ -147,6 +147,12 @@ function HistoryPage() {
           </div>
         </Entity>
         <Globe enableLighting />
+        <div className='toolbar-left'>
+          {" "}
+          {/* Display at Upper-Left corner */}
+          {/* <button>Click me!</button>
+          <h1>HOhoho</h1> */}
+        </div>
       </Viewer>
     </div>
   );
