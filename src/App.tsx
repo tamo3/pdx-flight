@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter, Route, Switch, Link, Redirect } from "react-router-dom";
-// import logo from './logo.svg';
 import { makeStyles, useTheme, Theme, createStyles } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
 import Hidden from "@material-ui/core/Hidden";
@@ -20,6 +19,7 @@ import ExploreIcon from "@material-ui/icons/Explore";
 import HistoryIcon from "@material-ui/icons/History";
 import InfoIcon from "@material-ui/icons/Info";
 import BugReportIcon from "@material-ui/icons/BugReport";
+import { Tooltip } from "@material-ui/core";
 import { Ion } from "cesium";
 
 import HomePage from "./page/Home";
@@ -29,26 +29,9 @@ import AboutPage from "./page/About";
 import DebugPage from "./page/Debug";
 
 import "./App.css";
-import { Tooltip } from "@material-ui/core";
 
+// todo: Ion.defaultAccessToken = {your-key-here};
 const drawerWidth = 160;
-
-// Fetch from server.
-function tmpFetch() {
-  fetch("/api/weoriu")
-    .then((response) => {
-      return response.json();
-    })
-    .then((data) => {
-      // console.log(data);
-      const dat = data.weoriu;
-      Ion.defaultAccessToken = dat as string;
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-}
-tmpFetch();
 
 // Responsive menu.
 // Based on: https://material-ui.com/components/drawers/#ResponsiveDrawer.tsx
@@ -86,6 +69,50 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 );
+
+// Main body -- overlaid multiple pages.
+function MainBody() {
+  // Get Cesium Key from server.
+  const [isFetching, setFetching] = useState(true);
+  useEffect(() => {
+    fetch("/api/weoriu")
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        // console.log(data);
+        const dat = data.weoriu;
+        Ion.defaultAccessToken = dat as string;
+        setFetching(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setFetching(false);
+      });
+  }, []);
+
+  if (isFetching) {
+    //  Don't display Cesium until we set the key.
+    return <p>Loading...</p>;
+  } else {
+    return (
+      <Switch>
+        <Route
+          exact
+          path='/'
+          render={() => {
+            return <Redirect to='/Home' />;
+          }}
+        />
+        <Route path='/Home' component={HomePage} />
+        <Route path='/Map' component={MapPage} />
+        <Route path='/History' component={HistoryPage} />
+        <Route path='/About' component={AboutPage} />
+        <Route path='/Debug' component={DebugPage} />
+      </Switch>
+    );
+  }
+}
 
 // Main application.
 function App() {
@@ -183,20 +210,24 @@ function App() {
         <main className={classes.content}>
           <div className={classes.toolbar} />
           <div className='cesiumContainer'>
-            <Switch>
-              <Route
-                exact
-                path='/'
-                render={() => {
-                  return <Redirect to='/Home' />;
-                }}
-              />
-              <Route path='/Home' component={HomePage} />
-              <Route path='/Map' component={MapPage} />
-              <Route path='/History' component={HistoryPage} />
-              <Route path='/About' component={AboutPage} />
-              <Route path='/Debug' component={DebugPage} />
-            </Switch>
+            <MainBody />
+            {/* 
+            {
+              <Switch>
+                <Route
+                  exact
+                  path='/'
+                  render={() => {
+                    return <Redirect to='/Home' />;
+                  }}
+                />
+                <Route path='/Home' component={HomePage} />
+                <Route path='/Map' component={MapPage} />
+                <Route path='/History' component={HistoryPage} />
+                <Route path='/About' component={AboutPage} />
+                <Route path='/Debug' component={DebugPage} />
+              </Switch>
+            } */}
           </div>
         </main>
       </BrowserRouter>

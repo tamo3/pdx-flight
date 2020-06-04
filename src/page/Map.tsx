@@ -45,23 +45,6 @@ import "./Map.css";
 CCamera.DEFAULT_VIEW_RECTANGLE = CameraHome;
 CCamera.DEFAULT_VIEW_FACTOR = 0;
 
-// Fetch from server.
-function tmpFetch() {
-  fetch("/api/weoriu")
-    .then((response) => {
-      return response.json();
-    })
-    .then((data) => {
-      // console.log(data);
-      const dat = data.weoriu;
-      Ion.defaultAccessToken = dat as string;
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-}
-tmpFetch();
-
 // Shallow comparison.
 function shallowEqual(obj1: any, obj2: any): boolean {
   return (
