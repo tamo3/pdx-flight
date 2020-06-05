@@ -30,11 +30,11 @@ html {
   /* height: 100px; */
   padding: 7px;
   border-radius: 7px;
-}
-
-.history-legend {
   background-color: rgba(222, 132, 245, 0.9);
 }
+
+/* .history-legend {
+} */
 
 @media only screen and (max-width: 599px) {
   .cesiumContainer {

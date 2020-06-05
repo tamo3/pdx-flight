@@ -22,7 +22,6 @@ import Airplane, { AirplaneProps } from "./Airplane";
 import { Pos2D, OriginalPos, CameraHome, GetCenterPosition } from "./cesium-util";
 import yellowDot from "./yellow.png";
 import grayDot from "./gray.png";
-import "./Map.css";
 
 // This must match with the data file names served by node server (i.e 2016-07-01-nnnnZ.json, etc)
 export const historyOfDate = "2016-07-01";
@@ -32,7 +31,7 @@ CCamera.DEFAULT_VIEW_RECTANGLE = CameraHome;
 CCamera.DEFAULT_VIEW_FACTOR = 0;
 
 // Legends at upper-left corner.
-function HistoryLegend() {
+function UpperLeftInfo() {
   const size = { height: 20, width: 20 };
   return (
     <div>
@@ -185,7 +184,7 @@ function HistoryPage() {
         </Entity>
         <Globe enableLighting />
         <div className='toolbar-left history-legend'>
-          <HistoryLegend />
+          <UpperLeftInfo />
         </div>
       </Viewer>
     </div>

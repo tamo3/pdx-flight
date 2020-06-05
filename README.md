@@ -20,9 +20,11 @@ From another CMD prompt:
 
     npm start                          # starts web application
 
+To use Historical Flight data, obtain a copy of historical zip file from https://www.adsbexchange.com/, extract them under ./server/historical-data/xxx (for example, ./server/historical-data/2016-07-01/. 2016-07-01.zip file causes errors when extracting files, but just ignore the errors and continue).
+
 # References
 
-This application uses the following libraries:
+This application uses the following libraries and APIs:
 
 - React
 - Cesium
@@ -31,3 +33,7 @@ This application uses the following libraries:
 - Material-ui
 - axios
 - express
+- OpenSky (https://opensky-network.org) for Realtime Flight Tracking.
+- ABS-B Exchange (https://www.adsbexchange.com/) for Historical Flight Tracking data when running locally.
+  ABS-B site has free sample historical data for evaluation (https://www.adsbexchange.com/data/).
+  This program interfaces with the format used by the sample data, but should be easy to adapt to any data format.

@@ -2,13 +2,12 @@
 // Display Realtime Airplane Positions
 ///////////////////////////////////////////////////////////////////////////////
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, FC } from "react";
 // import ReactDOM from 'react-dom';
 import { Viewer, Entity /*PointGraphics*/, Camera, CesiumComponentRef } from "resium";
 import Cesium, { Camera as CCamera, Cartesian3, Color, PinBuilder, VerticalOrigin } from "cesium";
 import Airplane, { AirplaneProps } from "./Airplane";
 import { Pos2D, OriginalPos, CameraHome, GetCenterPosition } from "./cesium-util";
-import "./Map.css";
 
 CCamera.DEFAULT_VIEW_RECTANGLE = CameraHome;
 CCamera.DEFAULT_VIEW_FACTOR = 0;
@@ -72,7 +71,7 @@ function openSkyToAirplaneProps(srcJson: any, count: number): AirplaneProps[] {
 function interpolatePosition(x: AirplaneProps, prevData: AirplaneProps[], count: number): AirplaneProps {
   const prev: AirplaneProps[] = prevData.filter((a) => (a.Call === x.Call ? a : null)); // Find the previous data of the same airplane.
   if (!prev || prev.length === 0) {
-    console.log(`prev is ${prev}`);
+    // console.log(`prev is ${prev}`);
     return x; // If no previous data found, then just return the current one.
   }
   const n = x.MyCnt - prev[0].MyCnt; // Count value difference.
@@ -87,8 +86,26 @@ function interpolatePosition(x: AirplaneProps, prevData: AirplaneProps[], count:
   return props;
 }
 
+// Info at upper-left corner.
+function UpperLeftInfo() {
+  // const size = { height: 20, width: 20 };
+  return (
+    <div>
+      <b>
+        Could not get Cesium key.
+        <br />
+        Forgot to set my_cesium_key?
+      </b>
+    </div>
+  );
+}
+
+type MapProps = {
+  keyFetch: number;
+};
+
 // Map page component.
-function MapPage() {
+const MapPage: FC<MapProps> = ({ keyFetch }) => {
   // React Hooks:
   const [airplaneData, setAirplaneData] = useState<AirplaneProps[]>([]); // Array of airplane data from the Server.
   const [airplaneData0, setAirplaneData0] = useState<AirplaneProps[]>([]); // Previous data, used as a storage for prefData.
@@ -154,6 +171,7 @@ function MapPage() {
   };
 
   // Render.
+  console.log("keyFetch = " + keyFetch);
   return (
     <div className='cesiumContainer'>
       <Viewer ref={refC} timeline={false} animation={false}>
@@ -173,10 +191,11 @@ function MapPage() {
             })}
           </div>
         </Entity>
+        {keyFetch < 0 ? <div className='toolbar-left'>{keyFetch < 0 ? <UpperLeftInfo /> : null}</div> : null}
       </Viewer>
       <p>Dbg Count : {count}</p>
     </div>
   );
-}
+};
 
 export default MapPage;

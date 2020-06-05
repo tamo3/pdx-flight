@@ -1,6 +1,0 @@
-.HomePage > :first-child {
-  /* To eliminate the gap between the top bar and the main content.  */
-  margin: 0;
-  /* background:yellow; */
-}
-

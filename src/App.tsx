@@ -31,11 +31,11 @@ import DebugPage from "./page/Debug";
 
 import "./App.css";
 
-//Ion.defaultAccessToken = "your-Cesium-key-here"; // <== TODO: Put your Cesium Key here!
-const drawerWidth = 160;
+const my_cesium_key = ""; // <== TODO: Put your Cesium Key here!
 
 // Responsive menu for small screen.
 // Based on: https://material-ui.com/components/drawers/#ResponsiveDrawer.tsx
+const drawerWidth = 160; // Left side menu/drawer size in pixels.
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -74,25 +74,36 @@ const useStyles = makeStyles((theme: Theme) =>
 // Main body -- overlaid multiple pages.
 function MainBody() {
   // Get Cesium Key from server.
-  const [isFetching, setFetching] = useState(true);
+  const [isFetching, setFetching] = useState(1); // 1=fetching, 0=fetched successfully, -1=error fetching.
   useEffect(() => {
     fetch("/api/weoriu")
       .then((response) => {
         return response.json();
       })
       .then((data) => {
-        // console.log(data);
+        console.log("AAA");
         const dat = data.weoriu;
-        Ion.defaultAccessToken = dat as string;
-        setFetching(false);
+        if (dat === undefined) {
+          console.log("Error failed to get Cesium key");
+          setFetching(-1);
+        } else {
+          Ion.defaultAccessToken = dat as string;
+          setFetching(0);
+        }
       })
       .catch((err) => {
+        console.log("BBB");
         console.log(err);
-        setFetching(false);
+        setFetching(-1);
       });
   }, []);
 
-  if (isFetching) {
+  if (my_cesium_key !== "") {
+    Ion.defaultAccessToken = my_cesium_key;
+    setFetching(0);
+  }
+
+  if (isFetching === 1) {
     //  Don't display Cesium until we set the key.
     return <p>Loading...</p>;
   } else {
@@ -106,8 +117,12 @@ function MainBody() {
           }}
         />
         {/* <Route path='/Home' component={HomePage} /> */}
-        <Route path='/Home' component={MapPage} />
-        <Route path='/History' component={HistoryPage} />
+        <Route path='/Home'>
+          <MapPage keyFetch={isFetching} />
+        </Route>
+        <Route path='/History'>
+          <HistoryPage />
+        </Route>
         <Route path='/About' component={AboutPage} />
         <Route path='/Debug' component={DebugPage} />
       </Switch>
