@@ -66,9 +66,8 @@ function interpolatePosition(x: AirplaneProps, prevData: AirplaneProps[], count:
   return props;
 }
 
-// Info at upper-left corner.
+// Info at upper-left corner: display error message when Cesium Key could not be set.
 function UpperLeftInfo() {
-  // const size = { height: 20, width: 20 };
   return (
     <div>
       <b>
