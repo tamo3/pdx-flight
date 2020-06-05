@@ -7,7 +7,7 @@ import React, { useEffect, useState, useRef, FC } from "react";
 import { Viewer, Entity /*PointGraphics*/, Camera, CesiumComponentRef } from "resium";
 import Cesium, { Camera as CCamera, Cartesian3, Color, PinBuilder, VerticalOrigin } from "cesium";
 import Airplane, { AirplaneProps } from "./Airplane";
-import { Pos2D, OriginalPos, CameraHome, GetCenterPosition } from "./cesium-util";
+import { Pos2D, OriginalPos, CameraHome, GetCenterPosition, useInterval } from "./cesium-util";
 
 CCamera.DEFAULT_VIEW_RECTANGLE = CameraHome;
 CCamera.DEFAULT_VIEW_FACTOR = 0;
@@ -20,25 +20,25 @@ function shallowEqual(obj1: any, obj2: any): boolean {
   );
 }
 
-// Custom Hook to generate clock tick event.
-// From: https://overreacted.io/making-setinterval-declarative-with-react-hooks/
-// Cesium has its own clock tick but it is too fast (every 1/60 sec) for this page.
-function useInterval(callback: any, delay: number) {
-  const savedCallback: any = useRef();
-  useEffect(() => {
-    savedCallback.current = callback;
-  }, [callback]);
+// // Custom Hook to generate clock tick event.
+// // From: https://overreacted.io/making-setinterval-declarative-with-react-hooks/
+// // Cesium has its own clock tick but it is too fast (every 1/60 sec) for this page.
+// function useInterval(callback: any, delay: number) {
+//   const savedCallback: any = useRef();
+//   useEffect(() => {
+//     savedCallback.current = callback;
+//   }, [callback]);
 
-  useEffect(() => {
-    function tick() {
-      savedCallback.current();
-    }
-    if (delay !== null) {
-      let id = setInterval(tick, delay);
-      return () => clearInterval(id);
-    }
-  }, [delay]);
-}
+//   useEffect(() => {
+//     function tick() {
+//       savedCallback.current();
+//     }
+//     if (delay !== null) {
+//       let id = setInterval(tick, delay);
+//       return () => clearInterval(id);
+//     }
+//   }, [delay]);
+// }
 
 // Convert JSON data from OpenSky to our format. src is a 2D array.
 function openSkyToAirplaneProps(srcJson: any, count: number): AirplaneProps[] {

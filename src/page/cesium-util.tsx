@@ -2,6 +2,7 @@
 // Utility Functions, Common types, etc.
 ///////////////////////////////////////////////////////////////////////////////
 
+import { useEffect, useRef } from "react";
 import { Cartesian2, Rectangle } from "cesium";
 
 export type Pos2D = {
@@ -54,4 +55,22 @@ export function GetCenterPosition(refC: any, percentage: number): Pos2D | null {
   return null;
 }
 
-// https://opensky-network.org/api/flights/aircraft?begin=1517184000&end=1517270400&icao24=a1c0fb
+// Custom Hook to generate clock tick event.
+// From: https://overreacted.io/making-setinterval-declarative-with-react-hooks/
+// Cesium has its own clock tick but it is too fast (every 1/60 sec) for this page.
+export function useInterval(callback: any, delay: number) {
+  const savedCallback: any = useRef();
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
+
+  useEffect(() => {
+    function tick() {
+      savedCallback.current();
+    }
+    if (delay !== null) {
+      let id = setInterval(tick, delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
+}
