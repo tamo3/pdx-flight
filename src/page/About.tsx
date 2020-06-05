@@ -33,6 +33,19 @@ const CameraStart = Rectangle.fromDegrees(
 CCamera.DEFAULT_VIEW_RECTANGLE = CameraStart;
 CCamera.DEFAULT_VIEW_FACTOR = 0;
 
+// Info at upper-left corner: about me.
+function UpperLeftInfo() {
+  return (
+    <div>
+      <b>
+        Created by: Tamotsu Tanabe
+        <br />
+        pdx.edu 2020 Spring Web Class Project
+      </b>
+    </div>
+  );
+}
+
 // About me page component.
 function AboutMe() {
   const [count, setCount] = useState(0);
@@ -44,7 +57,7 @@ function AboutMe() {
   };
 
   const start = { loc: Cartesian3.fromDegrees(36, -5.0, 30000000), name: "start", duration: 0 };
-  const pdx = { loc: Cartesian3.fromDegrees(OriginalPos.lng, OriginalPos.lat, 600000), name: "pdx", duration: 7 };
+  const pdx = { loc: Cartesian3.fromDegrees(OriginalPos.lng, OriginalPos.lat, 10000), name: "pdx", duration: 5 };
   const back = { loc: Cartesian3.fromDegrees(-120.0, 45.0, 10000000), name: "back", duration: 3 };
   let dest = start;
 
@@ -56,16 +69,25 @@ function AboutMe() {
   else dest = back;
   console.log(`${count} ${dest.name}`);
 
+  const desc = "<b>React</b><br/><b>Cesium</b><br/><b>Resium</b><br/><b>Material-ui<b>";
+
   return (
     <div className='cesiumContainer'>
-      <CesiumWidget>
-        {count < 20 && count % 5 === 0 ? <CameraFlyTo destination={dest.loc} duration={dest.duration} /> : null}
-        <LabelCollection modelMatrix={Transforms.eastNorthUpToFixedFrame(pdx.loc)}>
-          <Label fillColor={Color.CYAN} position={new Cartesian3(-1000000.0, -250000.0, 0.0)} text='React' />
-          <Label fillColor={Color.LIME} position={new Cartesian3(0.0, 0.0, 0.0)} text='Cesium' />
-          <Label fillColor={Color.YELLOW} position={new Cartesian3(1000000.0, 250000.0, 0.0)} text='Resium' />
-        </LabelCollection>
-      </CesiumWidget>
+      <Viewer timeline={false} animation={false}>
+        {count <= 10 && count % 5 === 0 ? <CameraFlyTo destination={dest.loc} duration={dest.duration} /> : null}
+        <Entity name='Libraries' description={desc} selected={count > 12 ? true : false}>
+          <LabelCollection modelMatrix={Transforms.eastNorthUpToFixedFrame(pdx.loc)}>
+            <Label fillColor={Color.CYAN} position={new Cartesian3(-1000000.0, -250000.0, 0.0)} text='React' />
+            <Label fillColor={Color.LIME} position={new Cartesian3(0.0, 0.0, 0.0)} text='Cesium' />
+            <Label fillColor={Color.YELLOW} position={new Cartesian3(1000000.0, 250000.0, 0.0)} text='Resium' />
+          </LabelCollection>
+        </Entity>
+        {count > 13 ? (
+          <div className='toolbar-left'>
+            <UpperLeftInfo />{" "}
+          </div>
+        ) : null}
+      </Viewer>
       <p>
         Dbg Count : {count} {dest.name} duration:{dest.duration}
       </p>
