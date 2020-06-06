@@ -9,11 +9,11 @@ function UpperLeftInfo() {
     <div>
       <b>
         Created by:{" "}
-        <a href='https://tamo3.github.io/3-music.html' target='_blank'>
+        <a href='https://tamo3.github.io/3-music.html' target='_blank' rel='noopener noreferrer'>
           Tamotsu Tanabe
         </a>
         <br />
-        <a href='https://www.pdx.edu/' target='_blank'>
+        <a href='https://www.pdx.edu/' target='_blank' rel='noopener noreferrer'>
           pdx.edu
         </a>{" "}
         2020 Spring Web Class Project
