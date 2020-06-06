@@ -150,7 +150,7 @@ const MapPage: FC<MapProps> = ({ keyFetch }) => {
   };
 
   // Render.
-  console.log("keyFetch = " + keyFetch);
+  // console.log("keyFetch = " + keyFetch);
   return (
     <div className='cesiumContainer'>
       <Viewer ref={refC} timeline={false} animation={false}>

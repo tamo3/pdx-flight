@@ -12,15 +12,17 @@ In your working directory:
 
 # Run Locally
 
-From CMD prompt:
+From a terminal:
 
-    npm run server                     # starts node server
+    yarn run server                     # starts node server
 
-From another CMD prompt:
+From another terminal:
 
-    npm start                          # starts web application
+    yarn start                          # starts web application
 
-To use Historical Flight data, obtain a copy of historical zip file from https://www.adsbexchange.com/, extract them under ./server/historical-data/xxx (for example, ./server/historical-data/2016-07-01/. 2016-07-01.zip file causes errors when extracting files, but just ignore the errors and continue).
+Linux should work too, but I used only Windows during the development.
+
+To use Historical Flight data, obtain a copy of historical zip file from https://www.adsbexchange.com/, extract them under ./server/historical-data/xxx (for example, ./server/.historical-data/2016-07-01/\*).
 
 # References
 
