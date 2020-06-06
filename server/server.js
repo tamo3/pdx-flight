@@ -20,6 +20,8 @@ const KEY_AVIATIONSTACK = process.env.API_KEY_AVIATIONSTACK;
 // Static File Serving 
 ///////////////////////////////////////////////////////////////////////////////
 
+let reactRootDir;
+
 if (process.env.NODE_ENV === 'production') {
   // NOTE: static pages, such as '/' or '/home' are served by the following code ('express.static'). 
   // __dirname: Node.js script to return the directory where this script is running.
@@ -33,14 +35,18 @@ if (process.env.NODE_ENV === 'production') {
   //   ... shows the log and it keeps displaying new log messages ...
   // 
   console.log(`Using ${__dirname}../build`);
-  app.use(express.static(path.join(__dirname, '../build'))); // build directory is ./server/../build
+  reactRootDir = '../build';
+  // app.use(express.static(path.join(__dirname, '../build'))); // build directory is ./server/../build
 }
 else {
   // TT: this is not really used. During the debugging, React uses its own server running and doesn't use
   // express server.
   console.log(`Using ${__dirname}../public`);
-  app.use(express.static(path.join(__dirname, '../public'))); // publicdirectory is ./server/../public
+  reactRootDir = '../public';
+  // app.use(express.static(path.join(__dirname, '../public'))); // publicdirectory is ./server/../public
 }
+app.use(express.static(path.join(__dirname, reactRootDir)));
+
 app.use(express.json());
 
 // console.log that your server is up and running
@@ -141,7 +147,6 @@ app.get('/api/history', (req, res) => {
 // Realtime Airplane Position Data using OpenSky
 ///////////////////////////////////////////////////////////////////////////////
 
-
 app.get('/api/opensky', (req, res) => {
   // URL example: "/api/opensky?lng=-122.595172&lat=45.5895&range=1000000"
   const range = req.query.range;
@@ -212,3 +217,8 @@ app.get('/api/aviationstack', (req, res) => {
 })
 
 
+// Handles any requests that don't match the ones above
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, reactRootDir, 'index.html'));
+});
+//app.use(express.static(path.join(__dirname, reactRootDir)));
