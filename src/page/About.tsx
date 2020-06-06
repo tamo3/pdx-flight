@@ -8,9 +8,15 @@ function UpperLeftInfo() {
   return (
     <div>
       <b>
-        Created by: <a href='https://tamo3.github.io/3-music.html'>Tamotsu Tanabe</a>
+        Created by:{" "}
+        <a href='https://tamo3.github.io/3-music.html' target='_blank'>
+          Tamotsu Tanabe
+        </a>
         <br />
-        <a href='https://www.pdx.edu/'>pdx.edu</a> 2020 Spring Web Class Project
+        <a href='https://www.pdx.edu/' target='_blank'>
+          pdx.edu
+        </a>{" "}
+        2020 Spring Web Class Project
       </b>
     </div>
   );
