@@ -10,7 +10,7 @@ function UpperLeftInfo() {
       <b>
         Created by: <a href='https://tamo3.github.io/3-music.html'>Tamotsu Tanabe</a>
         <br />
-        pdx.edu 2020 Spring Web Class Project
+        <a href='https://www.pdx.edu/'>pdx.edu</a> 2020 Spring Web Class Project
       </b>
     </div>
   );
