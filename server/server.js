@@ -73,21 +73,6 @@ app.get('/api/weoriu', (req, res) => {
   // console.log(k);
 });
 
-// app.get('/api/conv', (req, res) => {
-//   const dst = './server/.historical-data/2018-01-01';
-//   fs.readdir('./server/.historical-data/2016-07-01', function (err, files) {
-//     if (err) {
-//       return console.log('Unable to scan directory: ' + err);
-//     }
-//     //listing all files using forEach
-//     files.forEach(function (file) {
-//       // Do whatever you want to do with the file
-//       console.log(file);
-//       const rawData = fs.readFileSync(`./server/.historical-data/${directory}/${file}`);
-//       let data = JSON.parse(rawData);
-//     });
-//   });
-// });
 
 ///////////////////////////////////////////////////////////////////////////////
 // Historical Airplane Position Data API
@@ -221,4 +206,3 @@ app.get('/api/aviationstack', (req, res) => {
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, reactRootDir, 'index.html'));
 });
-//app.use(express.static(path.join(__dirname, reactRootDir)));

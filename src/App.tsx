@@ -33,6 +33,8 @@ import "./App.css";
 
 const my_cesium_key = ""; // <== TODO: Put your Cesium Key here!
 
+const historyTypes = ["Random"];
+
 // Responsive menu for small screen.
 // Based on: https://material-ui.com/components/drawers/#ResponsiveDrawer.tsx
 const drawerWidth = 160; // Left side menu/drawer size in pixels.
@@ -121,7 +123,7 @@ function MainBody() {
           <MapPage keyFetch={isFetching} />
         </Route>
         <Route path='/History'>
-          <HistoryPage />
+          <HistoryPage types={historyTypes} />
         </Route>
         <Route path='/About' component={AboutPage} />
         <Route path='/Debug' component={DebugPage} />

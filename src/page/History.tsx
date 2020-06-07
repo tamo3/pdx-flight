@@ -6,7 +6,7 @@
 //   https://www.virtualradarserver.co.uk/Documentation/Formats/AircraftList.aspx
 ///////////////////////////////////////////////////////////////////////////////
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, FC } from "react";
 import { Viewer, Entity /*PointGraphics*/, Camera, CameraFlyTo, Globe, CesiumComponentRef } from "resium";
 import Cesium, {
   Camera as CCamera,
@@ -31,10 +31,18 @@ CCamera.DEFAULT_VIEW_RECTANGLE = CameraHome;
 CCamera.DEFAULT_VIEW_FACTOR = 0;
 
 // Legends at upper-left corner.
-function UpperLeftInfo() {
+const UpperLeftInfo: FC<{ types: string[] }> = ({ types }) => {
   const size = { height: 20, width: 20 };
   return (
     <div>
+      <label>
+        <select name='history selection' id='history-dropdown'>
+          {types.map((x) => (
+            <option value={x}>{x}</option>
+          ))}
+        </select>
+      </label>
+      <br />
       <img className='my-image' src={yellowDot} alt={"Dot with yellow circle"} style={size} />
       <b> Airplane with call-sign</b>
       <br />
@@ -42,10 +50,10 @@ function UpperLeftInfo() {
       <b>Airplane without call-sign</b>
     </div>
   );
-}
+};
 
 // History Page component.
-function HistoryPage() {
+const HistoryPage: FC<{ types: string[] }> = ({ types }) => {
   // Server Access URL template: Files are from  https://history.adsbexchange.com/downloads/samples/
   // Extracted 2016-07-01.zip -- has the data for the day, every minutes.
 
@@ -57,6 +65,7 @@ function HistoryPage() {
     lng: OriginalPos.lng,
     lat: OriginalPos.lat,
   });
+  const [historyIndex, setHistoryIndex] = useState<number>(0);
 
   // Convert JSON data from ADS-B Exchange to our format. src is an array.
   function adsbToAirplaneProps(src: any): AirplaneProps[] {
@@ -184,11 +193,11 @@ function HistoryPage() {
         </Entity>
         <Globe enableLighting />
         <div className='toolbar-left history-legend'>
-          <UpperLeftInfo />
+          <UpperLeftInfo types={types} />
         </div>
       </Viewer>
     </div>
   );
-}
+};
 
 export default HistoryPage;

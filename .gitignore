@@ -3,7 +3,7 @@
 # Ignore flight historical data because they are huge!
 .historical-data
 .historical-data.*
-
+test.js
 
 # dependencies
 /node_modules
