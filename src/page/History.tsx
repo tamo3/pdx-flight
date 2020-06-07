@@ -6,7 +6,7 @@
 //   https://www.virtualradarserver.co.uk/Documentation/Formats/AircraftList.aspx
 ///////////////////////////////////////////////////////////////////////////////
 
-import React, { useEffect, useState, useRef, useContext, FC } from "react";
+import React, { useEffect, useState, useRef, FC } from "react";
 import { Viewer, Entity /*PointGraphics*/, Camera, CameraFlyTo, Globe, CesiumComponentRef } from "resium";
 import Cesium, {
   Camera as CCamera,
@@ -22,7 +22,6 @@ import Airplane, { AirplaneProps } from "./Airplane";
 import { Pos2D, OriginalPos, CameraHome, GetCenterPosition } from "./cesium-util";
 import yellowDot from "./yellow.png";
 import grayDot from "./gray.png";
-//import { HistoryContext } from "../App";
 
 // This must match with the data file names served by node server (i.e 2016-07-01-nnnnZ.json, etc)
 // export const historyOfDate = "2016-07-01";
@@ -35,6 +34,7 @@ export type HistoryProps = {
   types: string[];
   typeIndex: number;
   cb: any;
+  update: any;
 };
 
 // Legends at upper-left corner.
@@ -51,18 +51,29 @@ const UpperLeftInfo: FC<{ props: HistoryProps }> = ({ props }) => {
         </select>
       </label>
       <br />
-      <img className='my-image' src={yellowDot} alt={"Dot with yellow circle"} style={size} />
-      <b> Airplane with call-sign</b>
+      <img
+        className='my-image'
+        src={yellowDot}
+        alt={"Dot with yellow circle"}
+        title={"Dot with yellow circle"}
+        style={size}
+      />
+      <b> : aircraft with call-sign</b>
       <br />
-      <img className='my-image' src={grayDot} alt={"Dot with gray circle"} style={size} />{" "}
-      <b>Airplane without call-sign</b>
+      <img
+        className='my-image'
+        src={grayDot}
+        alt={"Dot with gray circle"}
+        title={"Dot with gray circle"}
+        style={size}
+      />{" "}
+      <b> : aircraft without call-sign</b>
     </div>
   );
 };
 
 // History Page component.
 const HistoryPage = ({ props }: { props: HistoryProps }) => {
-  //  const HistoryPage: FC<HistoryProps> = (/*{ types, typeIndex, cb }*/ props) => {
   // Server Access URL template: Files are from  https://history.adsbexchange.com/downloads/samples/
   // Extracted 2016-07-01.zip -- has the data for the day, every minutes.
 
@@ -75,9 +86,6 @@ const HistoryPage = ({ props }: { props: HistoryProps }) => {
     lat: OriginalPos.lat,
   });
   const currentHistory = props.types[props.typeIndex];
-  // const [historyIndex, setHistoryIndex] = useState<number>(0);
-  // const history = useContext(HistoryContext);
-  // const currentHistory = history.types[history.index];
 
   // Convert JSON data from ADS-B Exchange to our format. src is an array.
   function adsbToAirplaneProps(src: any): AirplaneProps[] {
@@ -144,7 +152,7 @@ const HistoryPage = ({ props }: { props: HistoryProps }) => {
           console.log(err);
         });
     }
-  }, [pos2D, curTime]);
+  }, [pos2D, curTime, currentHistory]);
 
   // Camera moved, update position.
   function updatePosition(percentage: number): void {
@@ -175,7 +183,7 @@ const HistoryPage = ({ props }: { props: HistoryProps }) => {
       const timeLine = refC.current.cesiumElement.timeline;
       timeLine.zoomTo(clock.startTime, clock.stopTime);
     }
-  }, []); // ESlint complains about this (add onTick, etc), but if you do so, then things don't work well.
+  }, [currentHistory]); // ESlint complains about this (add onTick, etc), but if you do so, then things don't work well.
   // I think it is OK because this is a one time initialization.
 
   const pinBuilder = new PinBuilder();
@@ -183,11 +191,6 @@ const HistoryPage = ({ props }: { props: HistoryProps }) => {
     image: pinBuilder.fromText("PDX", Color.BLACK, 48).toDataURL(),
     verticalOrigin: VerticalOrigin.BOTTOM,
   };
-
-  function onChangeCb(event: any): void {
-    console.log(event.target.value);
-    // historyOfDate = event.target.value;
-  }
 
   // Render
   return (

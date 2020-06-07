@@ -115,13 +115,13 @@ app.get('/api/history', (req, res) => {
   let file = req.query.file;
   console.log(file);
   if (/*file.indexOf("2038-01-01") === 0 ||*/  file.indexOf("Random") === 0) {
-    file = "2016-07-01-0000Z.json";
+    file = "2016-07-01/2016-07-01-0000Z.json"; // todo: implement this.
   }
 
-  let directory = file.match(/[0-9]+-[0-9]+-[0-9]+/)[0]; // May throw if the file doesn't exist.
+  // const  directory = file.match(/[0-9]+-[0-9]+-[0-9]+/)[0]; // May throw if the file doesn't exist.
   const circle = [req.query.lat, req.query.lng, req.query.range];
 
-  const rawData = fs.readFileSync(`./server/.historical-data/${directory}/${file}`);
+  const rawData = fs.readFileSync(`./server/.historical-data/${file}`);
   let data = JSON.parse(rawData);
 
   // Filter out data:

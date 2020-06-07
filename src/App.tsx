@@ -73,29 +73,10 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-// export type HistoryType = {
-//   types: string[];
-//   index: number;
-// };
-// export const HistoryContext = createContext({ types: ["Random"], index: 0 });
-
 // Main body -- overlaid multiple pages.
 function MainBody({ historyProps }: { historyProps: HistoryProps }) {
   // Get Cesium Key from server.
   const [isFetching, setFetching] = useState(1); // 1=fetching, 0=fetched successfully, -1=error fetching.
-  // const [historyProps, setHistoryProps] = useState({
-  //   types: ["Random"],
-  //   typeIndex: 0,
-  //   cb: historyTypeCallback,
-  // });
-
-  // function historyTypeCallback(changedValue: any): void {
-  //   setHistoryProps({
-  //     types: historyProps.types,
-  //     typeIndex: historyProps.typeIndex, // QQQ
-  //     cb: historyProps.cb,
-  //   });
-  // }
 
   useEffect(() => {
     fetch("/api/weoriu")
@@ -110,6 +91,8 @@ function MainBody({ historyProps }: { historyProps: HistoryProps }) {
           setFetching(-1);
         } else {
           Ion.defaultAccessToken = dat as string;
+          if (data.dirs) historyProps.types = data.dirs;
+          historyProps.update(historyProps);
           setFetching(0);
         }
       })
@@ -212,23 +195,30 @@ function App() {
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
-  // const [historyOfDate, setHistoryOfDate] = useState("");
-  const [historyProps, setHistoryProps] = useState({
-    types: ["Random"],
+  const [historyProps, setHistoryProps] = useState<HistoryProps>({
+    types: [""],
     typeIndex: 0,
     cb: historyTypeCallback,
+    update: historyTypeUpdate,
   });
-  const currentHistory = historyProps.types[historyProps.typeIndex];
 
   const container = window !== undefined ? () => document.body : undefined;
 
+  const histProps = historyProps; // Make a (shallow) copy.
+  // NOTE: callback() capture historyProps inside as closures, so need to get a value outside of callbacks.
   function historyTypeCallback(changedValue: any): void {
     setHistoryProps({
-      types: historyProps.types,
-      typeIndex: historyProps.typeIndex, // QQQ
-      cb: historyProps.cb,
+      types: histProps.types,
+      typeIndex: changedValue.target.selectedIndex, // Index to the newly selected item.
+      cb: histProps.cb,
+      update: histProps.update,
     });
   }
+  function historyTypeUpdate(props: HistoryProps): void {
+    setHistoryProps(props);
+    console.log(props);
+  }
+  console.log(historyProps);
 
   return (
     <div className={classes.root}>
