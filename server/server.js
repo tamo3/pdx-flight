@@ -66,11 +66,16 @@ app.get('/api/debug', (req, res) => {
   // console.log(k);
 });
 
+
+
 app.get('/api/weoriu', (req, res) => {
+  // Scan directories under .historical-data.
+  const directories = fs.readdirSync(`./server/.historical-data/`);
   console.log(' server app.get /express_backend called');
   const k = process.env.REACT_APP_CESIUM;
-  res.send({ "weoriu": k });
-  // console.log(k);
+  const data = { "weoriu": k, "dirs": directories };
+  res.send(data);
+  console.log(data);
 });
 
 
@@ -97,6 +102,8 @@ function InRange(shortTrailsCos, circle) {
   return (distance(shortTrailsCos[0], shortTrailsCos[1], circle[0], circle[1]) < circle[2]);
 }
 
+
+
 app.get('/api/history', (req, res) => {
   // URL example: "/api/history?file=2016-07-01-0000Z.json&lng=-122.595172&lat=45.5895&range=1000000
   // 45.423813, -122.727625  // oregon lat, lng
@@ -105,8 +112,13 @@ app.get('/api/history', (req, res) => {
 
   // Since the following is a synchronous code, no need to try..catch myself(?).
   // Express would catch by itself.
-  const file = req.query.file;
-  const directory = file.match(/[0-9]+-[0-9]+-[0-9]+/)[0]; // May throw if the file doesn't exist.
+  let file = req.query.file;
+  console.log(file);
+  if (/*file.indexOf("2038-01-01") === 0 ||*/  file.indexOf("Random") === 0) {
+    file = "2016-07-01-0000Z.json";
+  }
+
+  let directory = file.match(/[0-9]+-[0-9]+-[0-9]+/)[0]; // May throw if the file doesn't exist.
   const circle = [req.query.lat, req.query.lng, req.query.range];
 
   const rawData = fs.readFileSync(`./server/.historical-data/${directory}/${file}`);

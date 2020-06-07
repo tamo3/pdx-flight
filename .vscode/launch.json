@@ -24,7 +24,7 @@
       "request": "launch",
       "name": "Launch Node Server",
       "skipFiles": ["<node_internals>/**"],
-      "program": "${workspaceFolder}\\server\\test.js"
+      "program": "${workspaceFolder}\\server\\server.js"
     }
   ]
 }

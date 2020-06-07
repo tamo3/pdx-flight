@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Plot airplanes based on historical data.
 //
-// - It is assumed the data is from  https://history.adsbexchange.com/downloads/samples/  2016-07-01.zip
+// - It is assumed the data is from  https://history.adsbexchange.com/downloads/samples/
 //   2016-07-01.zip has all the data for the day, the format seems to be the same as:
 //   https://www.virtualradarserver.co.uk/Documentation/Formats/AircraftList.aspx
 ///////////////////////////////////////////////////////////////////////////////
 
-import React, { useEffect, useState, useRef, FC } from "react";
+import React, { useEffect, useState, useRef, useContext, FC } from "react";
 import { Viewer, Entity /*PointGraphics*/, Camera, CameraFlyTo, Globe, CesiumComponentRef } from "resium";
 import Cesium, {
   Camera as CCamera,
@@ -22,21 +22,26 @@ import Airplane, { AirplaneProps } from "./Airplane";
 import { Pos2D, OriginalPos, CameraHome, GetCenterPosition } from "./cesium-util";
 import yellowDot from "./yellow.png";
 import grayDot from "./gray.png";
+import { HistoryContext } from "../App";
 
 // This must match with the data file names served by node server (i.e 2016-07-01-nnnnZ.json, etc)
-export const historyOfDate = "2016-07-01";
+// export const historyOfDate = "2016-07-01";
 
 const cameraDest = Cartesian3.fromDegrees(OriginalPos.lng, OriginalPos.lat, 250000);
 CCamera.DEFAULT_VIEW_RECTANGLE = CameraHome;
 CCamera.DEFAULT_VIEW_FACTOR = 0;
 
+// interface TypeCallback {
+//   handler: (event: any) => void
+// }
+
 // Legends at upper-left corner.
-const UpperLeftInfo: FC<{ types: string[] }> = ({ types }) => {
+const UpperLeftInfo: FC<{ types: string[]; cb: any }> = ({ types, cb }) => {
   const size = { height: 20, width: 20 };
   return (
     <div>
       <label>
-        <select name='history selection' id='history-dropdown'>
+        <select name='history selection' id='history-dropdown' onChange={cb}>
           {types.map((x) => (
             <option value={x}>{x}</option>
           ))}
@@ -66,6 +71,8 @@ const HistoryPage: FC<{ types: string[] }> = ({ types }) => {
     lat: OriginalPos.lat,
   });
   const [historyIndex, setHistoryIndex] = useState<number>(0);
+  const history = useContext(HistoryContext);
+  const currentHistory = history.types[history.index];
 
   // Convert JSON data from ADS-B Exchange to our format. src is an array.
   function adsbToAirplaneProps(src: any): AirplaneProps[] {
@@ -114,7 +121,7 @@ const HistoryPage: FC<{ types: string[] }> = ({ types }) => {
       const min = Math.floor(minutes % 60);
       const hour = Math.floor(minutes / 60);
       const timeStr = hour.toString().padStart(2, "0") + min.toString().padStart(2, "0");
-      const urlBase = `/api/history?file=${historyOfDate}-_TIME_Z.json&lng=_LNG_&lat=_LAT_&range=1000000`;
+      const urlBase = `/api/history?file=${currentHistory}/${currentHistory}-_TIME_Z.json&lng=_LNG_&lat=_LAT_&range=1000000`;
       const url = urlBase
         .replace("_LNG_", pos2D.lng.toString())
         .replace("_LAT_", pos2D.lat.toString())
@@ -145,11 +152,13 @@ const HistoryPage: FC<{ types: string[] }> = ({ types }) => {
     if (refC.current?.cesiumElement) {
       // Make sure Viewer is mounted. ref.current.cesiumElement is Cesium.Viewer
 
+      const date = currentHistory === "Random" ? "2038-01-01" : currentHistory;
+
       // Initialize the Clock/Animation Widget.
       const clock = refC.current.cesiumElement.clockViewModel;
       // const tm = clock.currentTime; console.log(tm); console.log(JulianDate.toDate(tm));
-      clock.currentTime = JulianDate.fromIso8601(historyOfDate);
-      clock.startTime = JulianDate.fromIso8601(historyOfDate);
+      clock.currentTime = JulianDate.fromIso8601(date);
+      clock.startTime = JulianDate.fromIso8601(date);
       clock.stopTime = JulianDate.addDays(clock.startTime, 1, clock.stopTime);
       clock.clockRange = ClockRange.LOOP_STOP; // loop when we hit the end time
       clock.clockStep = ClockStep.SYSTEM_CLOCK_MULTIPLIER;
@@ -169,6 +178,11 @@ const HistoryPage: FC<{ types: string[] }> = ({ types }) => {
     image: pinBuilder.fromText("PDX", Color.BLACK, 48).toDataURL(),
     verticalOrigin: VerticalOrigin.BOTTOM,
   };
+
+  function onChangeCb(event: any): void {
+    console.log(event.target.value);
+    // historyOfDate = event.target.value;
+  }
 
   // Render
   return (
@@ -193,7 +207,7 @@ const HistoryPage: FC<{ types: string[] }> = ({ types }) => {
         </Entity>
         <Globe enableLighting />
         <div className='toolbar-left history-legend'>
-          <UpperLeftInfo types={types} />
+          <UpperLeftInfo types={types} cb={onChangeCb} />
         </div>
       </Viewer>
     </div>
