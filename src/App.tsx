@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext, useContext } from "react";
+import React, { useState, useEffect /*createContext, useContext*/ } from "react";
 import { BrowserRouter, Route, Switch, Link, Redirect, useLocation } from "react-router-dom";
 import { makeStyles, useTheme, Theme, createStyles } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
@@ -21,7 +21,7 @@ import { Tooltip } from "@material-ui/core";
 import { Ion } from "cesium";
 
 import MapPage from "./page/Map";
-import HistoryPage from "./page/History";
+import HistoryPage, { HistoryProps } from "./page/History";
 import AboutPage from "./page/About";
 
 // import ExploreIcon from "@material-ui/icons/Explore";
@@ -33,7 +33,7 @@ import "./App.css";
 
 const my_cesium_key = ""; // <== TODO: Put your Cesium Key here!
 
-const historyTypes = ["2016-07-01", "Random"];
+// const historyTypes = ["2016-07-01", "Random"];
 
 // Responsive menu for small screen.
 // Based on: https://material-ui.com/components/drawers/#ResponsiveDrawer.tsx
@@ -73,16 +73,30 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export type HistoryType = {
-  types: string[];
-  index: number;
-};
-export const HistoryContext = createContext({ types: ["Random"], index: 0 });
+// export type HistoryType = {
+//   types: string[];
+//   index: number;
+// };
+// export const HistoryContext = createContext({ types: ["Random"], index: 0 });
 
 // Main body -- overlaid multiple pages.
-function MainBody() {
+function MainBody({ historyProps }: { historyProps: HistoryProps }) {
   // Get Cesium Key from server.
   const [isFetching, setFetching] = useState(1); // 1=fetching, 0=fetched successfully, -1=error fetching.
+  // const [historyProps, setHistoryProps] = useState({
+  //   types: ["Random"],
+  //   typeIndex: 0,
+  //   cb: historyTypeCallback,
+  // });
+
+  // function historyTypeCallback(changedValue: any): void {
+  //   setHistoryProps({
+  //     types: historyProps.types,
+  //     typeIndex: historyProps.typeIndex, // QQQ
+  //     cb: historyProps.cb,
+  //   });
+  // }
+
   useEffect(() => {
     fetch("/api/weoriu")
       .then((response) => {
@@ -129,7 +143,7 @@ function MainBody() {
           <MapPage keyFetch={isFetching} />
         </Route>
         <Route path='/History'>
-          <HistoryPage types={historyTypes} />
+          <HistoryPage props={historyProps} />
         </Route>
         <Route path='/About' component={AboutPage} />
         <Route path='/Debug' component={DebugPage} />
@@ -142,13 +156,13 @@ function MainBody() {
 function DrawerContents() {
   const classes = useStyles();
   const location = useLocation();
-  const history = useContext(HistoryContext);
-  const currentHistory = history.types[history.index];
+  // const history = useContext(HistoryContext);
+  // const currentHistory = history.types[history.index];
   const icons = [<HomeIcon />, /*<ExploreIcon />,*/ <HistoryIcon />, <InfoIcon />, <BugReportIcon />];
   const toolTips = [
     `Realtime Flight Tracking`,
     // `Map page`,
-    `Historical airplane positions for ${currentHistory}`,
+    `Historical airplane positions`,
     `About this website`,
     `For Debug`,
   ];
@@ -182,14 +196,13 @@ function DrawerContents() {
   );
 }
 
-function Title() {
+const Title = ({ props }: { props: HistoryProps }): JSX.Element => {
+  const currentHistory = props.types[props.typeIndex];
   const location = useLocation();
-  const history = useContext(HistoryContext);
-  const currentHistory = history.types[history.index];
   if (location.pathname === "/History") return <div>{`PDX-Flight : Historical Flight Data (${currentHistory})`}</div>;
   if (location.pathname === "/Home") return <div>{`PDX-Flight : Realtime Tracking`}</div>;
   return <div>PDX-Flight</div>;
-}
+};
 
 // Main application.
 function App() {
@@ -200,7 +213,22 @@ function App() {
     setMobileOpen(!mobileOpen);
   };
   // const [historyOfDate, setHistoryOfDate] = useState("");
+  const [historyProps, setHistoryProps] = useState({
+    types: ["Random"],
+    typeIndex: 0,
+    cb: historyTypeCallback,
+  });
+  const currentHistory = historyProps.types[historyProps.typeIndex];
+
   const container = window !== undefined ? () => document.body : undefined;
+
+  function historyTypeCallback(changedValue: any): void {
+    setHistoryProps({
+      types: historyProps.types,
+      typeIndex: historyProps.typeIndex, // QQQ
+      cb: historyProps.cb,
+    });
+  }
 
   return (
     <div className={classes.root}>
@@ -217,7 +245,7 @@ function App() {
               <MenuIcon />
             </IconButton>
             <Typography variant='h6' noWrap>
-              <Title />
+              <Title props={historyProps} />
             </Typography>
           </Toolbar>
         </AppBar>
@@ -254,7 +282,7 @@ function App() {
         <main className={classes.content}>
           <div className={classes.toolbar} />
           <div className='pageContainer'>
-            <MainBody />
+            <MainBody historyProps={historyProps} />
           </div>
         </main>
       </BrowserRouter>

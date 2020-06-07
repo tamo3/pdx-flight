@@ -22,7 +22,7 @@ import Airplane, { AirplaneProps } from "./Airplane";
 import { Pos2D, OriginalPos, CameraHome, GetCenterPosition } from "./cesium-util";
 import yellowDot from "./yellow.png";
 import grayDot from "./gray.png";
-import { HistoryContext } from "../App";
+//import { HistoryContext } from "../App";
 
 // This must match with the data file names served by node server (i.e 2016-07-01-nnnnZ.json, etc)
 // export const historyOfDate = "2016-07-01";
@@ -31,18 +31,21 @@ const cameraDest = Cartesian3.fromDegrees(OriginalPos.lng, OriginalPos.lat, 2500
 CCamera.DEFAULT_VIEW_RECTANGLE = CameraHome;
 CCamera.DEFAULT_VIEW_FACTOR = 0;
 
-// interface TypeCallback {
-//   handler: (event: any) => void
-// }
+export type HistoryProps = {
+  types: string[];
+  typeIndex: number;
+  cb: any;
+};
 
 // Legends at upper-left corner.
-const UpperLeftInfo: FC<{ types: string[]; cb: any }> = ({ types, cb }) => {
+const UpperLeftInfo: FC<{ props: HistoryProps }> = ({ props }) => {
+  // const UpperLeftInfo: FC<{ types: string[]; cb: any }> = ({ types, cb }) => {
   const size = { height: 20, width: 20 };
   return (
     <div>
       <label>
-        <select name='history selection' id='history-dropdown' onChange={cb}>
-          {types.map((x) => (
+        <select name='history selection' id='history-dropdown' onChange={props.cb}>
+          {props.types.map((x) => (
             <option value={x}>{x}</option>
           ))}
         </select>
@@ -58,7 +61,8 @@ const UpperLeftInfo: FC<{ types: string[]; cb: any }> = ({ types, cb }) => {
 };
 
 // History Page component.
-const HistoryPage: FC<{ types: string[] }> = ({ types }) => {
+const HistoryPage = ({ props }: { props: HistoryProps }) => {
+  //  const HistoryPage: FC<HistoryProps> = (/*{ types, typeIndex, cb }*/ props) => {
   // Server Access URL template: Files are from  https://history.adsbexchange.com/downloads/samples/
   // Extracted 2016-07-01.zip -- has the data for the day, every minutes.
 
@@ -70,9 +74,10 @@ const HistoryPage: FC<{ types: string[] }> = ({ types }) => {
     lng: OriginalPos.lng,
     lat: OriginalPos.lat,
   });
-  const [historyIndex, setHistoryIndex] = useState<number>(0);
-  const history = useContext(HistoryContext);
-  const currentHistory = history.types[history.index];
+  const currentHistory = props.types[props.typeIndex];
+  // const [historyIndex, setHistoryIndex] = useState<number>(0);
+  // const history = useContext(HistoryContext);
+  // const currentHistory = history.types[history.index];
 
   // Convert JSON data from ADS-B Exchange to our format. src is an array.
   function adsbToAirplaneProps(src: any): AirplaneProps[] {
@@ -207,7 +212,7 @@ const HistoryPage: FC<{ types: string[] }> = ({ types }) => {
         </Entity>
         <Globe enableLighting />
         <div className='toolbar-left history-legend'>
-          <UpperLeftInfo types={types} cb={onChangeCb} />
+          <UpperLeftInfo props={props} />
         </div>
       </Viewer>
     </div>
