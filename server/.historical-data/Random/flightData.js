@@ -114,7 +114,7 @@ exports.track = function (file) {
     const a = x.position(min);
     data.push(a);
   })
-  console.log(data);
+  // console.log(data);
   return data;
 }
 

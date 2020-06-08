@@ -116,7 +116,7 @@ app.get('/api/history', (req, res) => {
   // Express would catch by itself.
   let file = req.query.file;
   let data;
-  console.log(file);
+  // console.log(file);
   if (/*file.indexOf("2038-01-01") === 0 ||*/  file.indexOf("Random") === 0) {
     const directory = file.match(/[^/]+/)[0]; // May throw if the file doesn't exist.
 
