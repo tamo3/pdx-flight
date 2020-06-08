@@ -76,7 +76,7 @@ app.get('/api/weoriu', (req, res) => {
   const k = process.env.REACT_APP_CESIUM;
   const data = { "weoriu": k, "dirs": directories };
   res.send(data);
-  console.log(data);
+  // console.log(data);
 });
 
 
