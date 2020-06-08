@@ -41,10 +41,11 @@ export type HistoryProps = {
 const UpperLeftInfo: FC<{ props: HistoryProps }> = ({ props }) => {
   // const UpperLeftInfo: FC<{ types: string[]; cb: any }> = ({ types, cb }) => {
   const size = { height: 20, width: 20 };
+  const val = props.types[props.typeIndex];
   return (
     <div>
       <label>
-        <select name='history selection' id='history-dropdown' onChange={props.cb}>
+        <select name='history selection' id='history-dropdown' value={val} onChange={props.cb}>
           {props.types.map((x) => (
             <option value={x}>{x}</option>
           ))}
@@ -58,7 +59,7 @@ const UpperLeftInfo: FC<{ props: HistoryProps }> = ({ props }) => {
         title={"Dot with yellow circle"}
         style={size}
       />
-      <b> : aircraft with call-sign</b>
+      <b> : with call-sign and destination</b>
       <br />
       <img
         className='my-image'
@@ -67,7 +68,7 @@ const UpperLeftInfo: FC<{ props: HistoryProps }> = ({ props }) => {
         title={"Dot with gray circle"}
         style={size}
       />{" "}
-      <b> : aircraft without call-sign</b>
+      <b> : without call-sign or destination</b>
     </div>
   );
 };

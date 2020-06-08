@@ -132,7 +132,7 @@ app.get('/api/history', (req, res) => {
   else {
     // const  directory = file.match(/[0-9]+-[0-9]+-[0-9]+/)[0]; // May throw if the file doesn't exist.
     const rawData = fs.readFileSync(`./server/.historical-data/${file}`);
-    data0 = JSON.parse(rawData);
+    const data0 = JSON.parse(rawData);
     data = data0.acList;
   }
   const circle = [req.query.lat, req.query.lng, req.query.range];

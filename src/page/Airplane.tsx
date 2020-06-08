@@ -62,7 +62,7 @@ export const Airplane: FC<AirplaneArgs> = ({ dat, color }) => {
     dat.Call && dat.To ? (
       <PointGraphics color={colr} pixelSize={14} outlineColor={Color.YELLOW} outlineWidth={2} />
     ) : (
-      // Without call sign and destination, this is probably a small non passenger airplane, make it look a bit dim.
+      // Without call sign or destination, this is probably a small non passenger airplane, make it look a bit dim.
       <PointGraphics color={colr} pixelSize={6} outlineColor={Color.GRAY} outlineWidth={4} />
       // <RectangleGraphics material={colr} height={8} outlineWidth={8} fill={true} /> -- need coordinates transform!
     );
