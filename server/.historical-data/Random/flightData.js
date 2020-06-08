@@ -48,9 +48,9 @@ class AirCraft {
 
     this.Call = "TT" + String(id).padStart(3, '0');
     this.Cou = "USA";
-    this.To = "Portland";
+    this.To = "Your place";
     this.From = "Portland";
-    this.Mdl = "Virtual Plane";
+    this.Mdl = "<b>'     Advertise Here!!!'</b>";
     this.Op = "Virtual Tours"
     this.Icao = "TT" + String(id);
   }
