@@ -33,8 +33,6 @@ import "./App.css";
 
 const my_cesium_key = ""; // <== TODO: Put your Cesium Key here!
 
-// const historyTypes = ["2016-07-01", "Random"];
-
 // Responsive menu for small screen.
 // Based on: https://material-ui.com/components/drawers/#ResponsiveDrawer.tsx
 const drawerWidth = 160; // Left side menu/drawer size in pixels.

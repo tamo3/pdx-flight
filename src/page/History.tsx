@@ -92,7 +92,7 @@ const HistoryPage = ({ props }: { props: HistoryProps }) => {
     const props: AirplaneProps[] = src.map((x: any) => {
       const dst: AirplaneProps = {
         Call: x.Call, // "WJA531"
-        Cos: x.Cos, // At least 4 elements, lng, lat (degrees), time (UTC), alt feet(?).
+        Cos: x.Cos, // At least 4 elements, lat, lng (degrees), time (UTC), alt feet(?).
         Cou: x.Cou, // "Canada"
         From: x.From, // "CYYC Calgary, Canada"
         Icao: x.Icao, // "C03472"
@@ -165,7 +165,8 @@ const HistoryPage = ({ props }: { props: HistoryProps }) => {
     if (refC.current?.cesiumElement) {
       // Make sure Viewer is mounted. ref.current.cesiumElement is Cesium.Viewer
 
-      const date = currentHistory === "Random" ? "2038-01-01" : currentHistory;
+      // Anything starts with "Random" is considered to be a artificially generated flight tracks.
+      const date = currentHistory.indexOf("Random") === 0 ? "2038-01-01" : currentHistory;
 
       // Initialize the Clock/Animation Widget.
       const clock = refC.current.cesiumElement.clockViewModel;

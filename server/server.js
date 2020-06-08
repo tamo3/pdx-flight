@@ -10,6 +10,7 @@ const port = process.env.PORT || 5000;  // Use given port when deployed, or loca
 const axios = require("axios");
 const toFixed = require('tofixed');
 
+
 console.log('PUBLIC_URL is: ', process.env.PUBLIC_URL);
 
 
@@ -54,6 +55,8 @@ app.listen(port, () => console.log(`Listening on port ${port}`));
 
 
 
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Route: /api/debug -- for debugging.
 ///////////////////////////////////////////////////////////////////////////////
@@ -65,8 +68,6 @@ app.get('/api/debug', (req, res) => {
   // k = process.env.REACT_APP_CESIUM;
   // console.log(k);
 });
-
-
 
 app.get('/api/weoriu', (req, res) => {
   // Scan directories under .historical-data.
@@ -103,6 +104,7 @@ function InRange(shortTrailsCos, circle) {
 }
 
 
+let trackModules = [];
 
 app.get('/api/history', (req, res) => {
   // URL example: "/api/history?file=2016-07-01-0000Z.json&lng=-122.595172&lat=45.5895&range=1000000
@@ -113,22 +115,33 @@ app.get('/api/history', (req, res) => {
   // Since the following is a synchronous code, no need to try..catch myself(?).
   // Express would catch by itself.
   let file = req.query.file;
+  let data;
   console.log(file);
   if (/*file.indexOf("2038-01-01") === 0 ||*/  file.indexOf("Random") === 0) {
-    file = "2016-07-01/2016-07-01-0000Z.json"; // todo: implement this.
+    const directory = file.match(/[^/]+/)[0]; // May throw if the file doesn't exist.
+
+    // Is the module already loaded?
+    let m = trackModules[directory];
+    if (!m) {
+      m = require("./.historical-data/" + directory + "/flightData.js");
+      trackModules.push(m);
+    }
+    data = m.track(file);
+    // file = "2016-07-01/2016-07-01-0000Z.json"; // todo: implement this.
   }
-
-  // const  directory = file.match(/[0-9]+-[0-9]+-[0-9]+/)[0]; // May throw if the file doesn't exist.
+  else {
+    // const  directory = file.match(/[0-9]+-[0-9]+-[0-9]+/)[0]; // May throw if the file doesn't exist.
+    const rawData = fs.readFileSync(`./server/.historical-data/${file}`);
+    data0 = JSON.parse(rawData);
+    data = data0.acList;
+  }
   const circle = [req.query.lat, req.query.lng, req.query.range];
-
-  const rawData = fs.readFileSync(`./server/.historical-data/${file}`);
-  let data = JSON.parse(rawData);
 
   // Filter out data:
   // - Cos[] array has position and time.
   //   TT==='a' means the 4th value is the altitude. Filter out data without the altitude.
   // - Also, if the position is outside of the circular range, filter that out.
-  const inRange = data.acList.filter(x => {
+  const inRange = data.filter(x => {
     return (x.TT === 'a' && x.Cos && x.Cos.length >= 4 && InRange(x.Cos, circle));
   })
   // console.log(inRange);
