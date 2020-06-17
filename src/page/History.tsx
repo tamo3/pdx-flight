@@ -81,8 +81,13 @@ const HistoryPage = ({ props }: { props: HistoryProps }) => {
   // React Hooks:
   const [airplaneData, setAirplaneData] = useState<AirplaneProps[]>([]); // Array of airplane data from the Server.
   const [curTime, setCurTime] = useState<number>(0); // Time as seconds from 00:00, i.e "00:03:00" => 180, "01:00" => 3600.
+  const [lastMin, setLastMin] = useState<number>(1); // Last minute fetch was performed.
   const refC = useRef<CesiumComponentRef<Cesium.Viewer>>(null); // Points to Cesium.Viewer.
   const [pos2D, setPos2D] = useState<Pos2D>({
+    lng: OriginalPos.lng,
+    lat: OriginalPos.lat,
+  });
+  const [lastPos, setLastPos] = useState<Pos2D>({
     lng: OriginalPos.lng,
     lat: OriginalPos.lat,
   });
@@ -132,28 +137,32 @@ const HistoryPage = ({ props }: { props: HistoryProps }) => {
   useEffect(() => {
     if (1) {
       const minutes = curTime / 60; // minutes from 00:00.
-      const min = Math.floor(minutes % 60);
-      const hour = Math.floor(minutes / 60);
-      const timeStr = hour.toString().padStart(2, "0") + min.toString().padStart(2, "0");
-      const urlBase = `/api/history?file=${currentHistory}/${currentHistory}-_TIME_Z.json&lng=_LNG_&lat=_LAT_&range=1000000`;
-      const url = urlBase
-        .replace("_LNG_", pos2D.lng.toString())
-        .replace("_LAT_", pos2D.lat.toString())
-        .replace("_TIME_", timeStr);
-      fetch(url)
-        .then((response) => {
-          return response.json();
-        })
-        .then((data) => {
-          //console.log(data);
-          setAirplaneData(adsbToAirplaneProps(data)); // Set the received data array.
-        })
-        .catch((err) => {
-          console.log("Error!");
-          console.log(err);
-        });
+      if (minutes !== lastMin || lastPos.lat !== pos2D.lat || lastPos.lng !== pos2D.lng) {
+        const min = Math.floor(minutes % 60);
+        const hour = Math.floor(minutes / 60);
+        const timeStr = hour.toString().padStart(2, "0") + min.toString().padStart(2, "0");
+        const urlBase = `/api/history?file=${currentHistory}/${currentHistory}-_TIME_Z.json&lng=_LNG_&lat=_LAT_&range=1000000`;
+        const url = urlBase
+          .replace("_LNG_", pos2D.lng.toString())
+          .replace("_LAT_", pos2D.lat.toString())
+          .replace("_TIME_", timeStr);
+        fetch(url)
+          .then((response) => {
+            return response.json();
+          })
+          .then((data) => {
+            //console.log(data);
+            setAirplaneData(adsbToAirplaneProps(data)); // Set the received data array.
+          })
+          .catch((err) => {
+            console.log("Error!");
+            console.log(err);
+          });
+        setLastMin((x) => minutes);
+        setLastPos((x) => pos2D);
+      }
     }
-  }, [pos2D, curTime, currentHistory]);
+  }, [pos2D, curTime, currentHistory, lastMin, lastPos]);
 
   // Camera moved, update position.
   function updatePosition(percentage: number): void {
