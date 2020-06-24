@@ -32,17 +32,18 @@ To use Historical Flight data, obtain a copy of historical zip file from https:/
 This application uses the following libraries and APIs:
 
 - React
-- Cesium
-- Resium
-- Craco
-- Material-ui
-- axios
-- express
+- Cesium (https://cesium.com/)
+- Resium (https://github.com/darwin-education/resium)
+- Craco (https://github.com/darwin-education/craco-cesium)
+- Material-ui (https://material-ui.com/)
+- axios (https://www.npmjs.com/package/axios)
+- express (https://expressjs.com/)
 - OpenSky (https://opensky-network.org) for Realtime Flight Tracking.
 - ABS-B Exchange (https://www.adsbexchange.com/) for Historical Flight Tracking data when running locally.
   ABS-B site has free sample historical data for evaluation (https://www.adsbexchange.com/data/).
   This program interfaces with the format used by the sample data, but should be easy to adapt to any data format.
 
 # Comments
+
 - Airplanes within ~10,000Km from the center of the view are plotted.
-- The historical data is missing in the repo or the deployed version. You can see the "Random" data which is generated rondomly. Obviously, I had a math problem generating the random flight data -- most flights are around the north pole :-) 
+- The historical data is missing in the repo or the deployed version. You can see the "Random" data which is generated rondomly. Obviously, I had a math problem generating the random flight data -- most flights are around the north pole :-)
